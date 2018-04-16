@@ -1,0 +1,35 @@
+{
+    "name": "lbmzorx/yii2-giitool",
+    "description": "Yii PHP Framework Version 2 Gii Tool Extention",
+    "keywords": [
+        "yii2",
+        "gii",
+        "tool"
+    ],
+    "homepage": "http://www.roshure.com/",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "lbmzorx",
+            "email": "lbmzorx@163.com",
+            "homepage": "http://www.roshure.com/"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/lbmzorx/yii2-giitool"
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "yiisoft/yii2-composer": "~2.0.4"
+    },
+    "require-dev": {
+        "yiisoft/yii2-gii": "~2.0.0"
+    },
+    "autoload": {
+        "psr-4": {"lbmzorx\\": "src"}
+    },
+    "bin": [
+        "yii"
+    ]
+}
