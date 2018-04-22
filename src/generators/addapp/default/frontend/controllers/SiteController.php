@@ -1,4 +1,4 @@
-<?php echo "<?php"?>
+<?php echo "<?php\n"?>
 namespace <?=$generator->appname?>\controllers;
 
 use Yii;

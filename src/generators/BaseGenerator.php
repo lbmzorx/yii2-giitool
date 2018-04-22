@@ -9,7 +9,7 @@ namespace lbmzorx\giitool\generators;
 
 
 use yii\gii\Generator;
-class BaseGenerator extends Generator
+abstract class BaseGenerator extends Generator
 {
 
     public function renderFile($path,$template, $params = []){

@@ -1,4 +1,4 @@
-<?php echo "<?php"?>
+<?php echo "<?php\n"?>
 
 /* @var $this \yii\web\View */
 /* @var $content string */

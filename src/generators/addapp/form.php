@@ -4,6 +4,6 @@
 /* @var $generator yii\gii\generators\form\Generator */
 use lbmzorx\giitool\generators\addapp\Generator;
 echo $form->field($generator, 'appname');
-echo $form->field($generator, 'type')->dropDownList(Generator::$type_code);
-echo $form->field($generator, 'isinit')->dropDownList(Generator::$isinit_code);
-echo $form->field($generator, 'env')->dropDownList(Generator::$env_code);
+echo $form->field($generator, 'type')->radioList(Generator::$type_code);
+echo $form->field($generator, 'isinit')->radioList(Generator::$isinit_code);
+echo $form->field($generator, 'env')->radioList(Generator::$env_code);

@@ -1,4 +1,4 @@
-<?php echo "<?php"?>
+<?php echo "<?php\n"?>
 return [
     'id' => 'app-<?=$generator->appname?>-tests',
     'components' => [
