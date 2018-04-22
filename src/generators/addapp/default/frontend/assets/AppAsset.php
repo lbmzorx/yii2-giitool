@@ -1,13 +1,12 @@
 <?php echo "<?php"?>
 ?>
-<?="<?php echo "<?php"?>"?>
 
-namespace frontend\assets;
+namespace <?=$generator->appname?>\assets;
 
 use yii\web\AssetBundle;
 
 /**
- * Main frontend application asset bundle.
+ * Main <?=$generator->appname?> application asset bundle.
  */
 class AppAsset extends AssetBundle
 {

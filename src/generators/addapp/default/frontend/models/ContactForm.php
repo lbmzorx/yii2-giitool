@@ -1,6 +1,6 @@
 <?php echo "<?php"?>
 
-namespace frontend\models;
+namespace <?=$generator->appname?>\models;
 
 use Yii;
 use yii\base\Model;

@@ -1,5 +1,5 @@
 <?php echo "<?php"?>
-namespace frontend\tests;
+namespace <?=$generator->appname?>\tests;
 
 /**
  * Inherited Methods

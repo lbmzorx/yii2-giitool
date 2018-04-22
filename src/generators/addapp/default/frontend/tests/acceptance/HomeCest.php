@@ -1,7 +1,7 @@
 <?php echo "<?php"?>
-namespace frontend\tests\acceptance;
+namespace <?=$generator->appname?>\tests\acceptance;
 
-use frontend\tests\AcceptanceTester;
+use <?=$generator->appname?>\tests\AcceptanceTester;
 use yii\helpers\Url;
 
 class HomeCest

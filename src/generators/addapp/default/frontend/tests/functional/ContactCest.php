@@ -1,7 +1,7 @@
 <?php echo "<?php"?>
-namespace frontend\tests\functional;
+namespace <?=$generator->appname?>\tests\functional;
 
-use frontend\tests\FunctionalTester;
+use <?=$generator->appname?>\tests\FunctionalTester;
 
 /* @var $scenario \Codeception\Scenario */
 

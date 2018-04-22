@@ -1,5 +1,5 @@
 <?php echo "<?php"?>
-namespace frontend\models;
+namespace <?=$generator->appname?>\models;
 
 use yii\base\Model;
 use yii\base\InvalidParamException;
