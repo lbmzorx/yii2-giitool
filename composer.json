@@ -21,7 +21,8 @@
     },
     "require": {
         "php": ">=5.4.0",
-        "yiisoft/yii2": "*"
+        "yiisoft/yii2": "*",
+        "lbmzorx/yii2-components":"*"
     },
     "require-dev": {
         "yiisoft/yii2-gii": "~2.0.0"

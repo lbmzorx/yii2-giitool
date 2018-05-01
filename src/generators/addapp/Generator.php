@@ -275,7 +275,10 @@ class Generator extends BaseGenerator
         return $file;
     }
 
-
+    /**
+     * If need to init new application
+     * @return array|bool
+     */
     public function generateInit(){
         if($this->isinit==self::ISINIT_YES){
             $path=\yii::getAlias('@common').'/../'.$this->appname;
@@ -325,6 +328,10 @@ class Generator extends BaseGenerator
         }
     }
 
+    /**
+     * Generate new cookie validation key
+     * @return string
+     */
     public function generatorCookieValidationKey(){
         $length = 32;
         $bytes = openssl_random_pseudo_bytes($length);

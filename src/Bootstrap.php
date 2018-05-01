@@ -15,6 +15,7 @@ class Bootstrap implements BootstrapInterface
         if ($app->hasModule('gii')) {
             if (!isset($app->getModule('gii')->generators['giitool'])) {
                 $app->getModule('gii')->generators['giitool-addapp']['class']= 'lbmzorx\giitool\generators\addapp\Generator';
+                $app->getModule('gii')->generators['giitool-modelsall']['class']= 'lbmzorx\giitool\generators\modelsall\Generator';
             }
         }
     }
