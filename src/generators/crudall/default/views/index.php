@@ -4,48 +4,48 @@ use yii\helpers\Inflector;
 use yii\helpers\StringHelper;
 
 /* @var $this yii\web\View */
-/* @var $generator backend\components\gii\crud\Generator */
+/* @var $generator lbmzorx\giitool\generators\crudall\Generator */
 
-$urlParams = $generator->generateUrlParams();
-$nameAttribute = $generator->getNameAttribute();
+$urlParams = $generator->generateUrlParams($model);
+$nameAttribute = $generator->getNameAttribute($model);
 $statusCodeList=[];
 echo "<?php\n";
 ?>
 
 use yii\helpers\Html;
-use common\components\widget\BatchDelete;
-use <?= $generator->indexWidgetType === 'grid' ? "backend\\components\\grid\\GridView" : "yii\\widgets\\ListView" ?>;
+use lbmzorx\components\widget\BatchDelete;
+use <?= $generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\widgets\\ListView" ?>;
 <?= $generator->enablePjax ? 'use yii\widgets\Pjax;' : '' ?>
-<?=$generator->changeStatus? "use common\components\widget\BatchUpdate;":''?>
+<?=$generator->statusCode? "use lbmzorx\\components\\widgets\\BatchUpdate;":''?>
 
 
 /* @var $this yii\web\View */
-<?= !empty($generator->searchModelClass) ? "/* @var \$searchModel " . ltrim($generator->searchModelClass, '\\') . " */\n" : '' ?>
+/* @var $searchModel <?=ltrim($generator->searchNamespace, '\\').'\\'.$model. " */\n"?>
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = <?= $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) ?>;
+$this->title = <?= $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($model)))) ?>;
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerCss(\<\<\<\STYLE
         p .btn{margin-top:5px;}
 STYLE
 );
 ?>
-<div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-index">
+<div class="<?= Inflector::camel2id(StringHelper::basename($model)) ?>-index">
     <?='<?='?> \yii\widgets\Breadcrumbs::widget([
         'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
     ]) <?='?>'?>
     <div class="panel">
         <div class="panel-body">
 <?= $generator->enablePjax ? "    <?php Pjax::begin(); ?>\n" : '' ?>
-<?php if(!empty($generator->searchModelClass)): ?>
+<?php if(!empty($generator->searchNamespace)): ?>
 <?= "    <?php " . ($generator->indexWidgetType === 'grid' ? "// " : "") ?>echo $this->render('_search', ['model' => $searchModel]); ?>
 <?php endif; ?>
 
     <p>
-        <?= "<?= " ?>Html::a('<i class="fa fa-plus-square"></i> '.<?= $generator->generateString('Create ' . Inflector::camel2words(StringHelper::basename($generator->modelClass))) ?>, ['create'], ['class' => 'btn btn-success']) ?>
-        <?= "<?= " ?>BatchDelete::widget(['name'=>'Batch Deletes']) ?>
-<?php if($generator->changeStatus):?>
-<?php $changeStatus=explode(',',$generator->changeStatus); foreach ($changeStatus as $v):?>
+        <?= "<?= " ?>Html::a('<i class="fa fa-plus-square"></i> '.<?= $generator->generateString('Create ' . Inflector::camel2words(StringHelper::basename($model))) ?>, ['create'], ['class' => 'btn btn-success']) ?>
+        <?= "<?= " ?>BatchDelete::widget(['name'=>$generator->generateString('Batch Deletes')]) ?>
+<?php if($generator->statusCode):?>
+<?php $changeStatus=$generator->generateGetStatusCode($mode); foreach ($changeStatus as $v):?>
         <?= "<?= " ?>BatchUpdate::widget([ 'name'=>\Yii::t('model','<?=Inflector::camel2words($v)?>'),'attribute'=>'<?=$v?>','btnIcon'=>'<?=$v?>', ]) ?>
 <?php endforeach;?>
 <?php endif;?>
@@ -54,6 +54,15 @@ STYLE
 <?php if ($generator->indexWidgetType === 'grid'): ?>
     <?= "<?= " ?>GridView::widget([
         'dataProvider' => $dataProvider,
+        'page' =>[
+            'class'=>\lbmzorx\components\widgets\JumpPager::className(),
+            'firstPageLabel'=>Yii::t('lbmzorx','first'),
+            'nextPageLabel'=>Yii::t('lbmzorx','next'),
+            'prevPageLabel'=>Yii::t('lbmzorx','prev'),
+            'lastPageLabel'=>Yii::t('lbmzorx','last'),
+            'jButtonLabel' =>Yii::t('lbmzorx','Jump'),
+            'sButtonLabel' =>Yii::t('lbmzorx','PageSize'),
+        ],
         <?= !empty($generator->searchModelClass) ? "'filterModel' => \$searchModel,\n        'columns' => [\n" : "'columns' => [\n"; ?>
             ['class' => 'yii\grid\CheckboxColumn'],
 

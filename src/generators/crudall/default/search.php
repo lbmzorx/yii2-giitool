@@ -7,33 +7,31 @@ use yii\helpers\StringHelper;
 
 
 /* @var $this yii\web\View */
-/* @var $generator backend\components\gii\crud\Generator */
+/* @var $generator lbmzorx\giitool\generators\crudall\Generator */
 
-$modelClass = StringHelper::basename($generator->modelClass);
+
 $searchModelClass = StringHelper::basename($generator->searchModelClass);
-if ($modelClass === $searchModelClass) {
-    $modelAlias = $modelClass . 'Model';
-}
-$rules = $generator->generateSearchRules();
-$labels = $generator->generateSearchLabels();
-$searchAttributes = $generator->getSearchAttributes();
-$searchConditions = $generator->generateSearchConditions();
+
+$rules = $generator->generateSearchRules($model);
+$labels = $generator->generateSearchLabels($model);
+$searchAttributes = $generator->getSearchAttributes($model);
+$searchConditions = $generator->generateSearchConditions($model);
 
 echo "<?php\n";
 ?>
 
-namespace <?= StringHelper::dirname(ltrim($generator->searchModelClass, '\\')) ?>;
+namespace <?= StringHelper::dirname(ltrim($generator->searchNamespace, '\\')) ?>;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use <?= ltrim($generator->modelClass, '\\') . (isset($modelAlias) ? " as $modelAlias" : "") ?>;
-use common\components\events\SearchEvent;
+use lbmzorx\components\events\SearchEvent;
+use <?=trim($generator->modelNamespace,'\\').'\\'.$model?> as DataModel;
 
 /**
- * <?= $searchModelClass ?> represents the model behind the search form of `<?= $generator->modelClass ?>`.
+ * <?= $model ?> represents the model behind the search form of `<?= $model ?>`.
  */
-class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $modelClass ?>
+class <?= $model ?> extends DataModel
 
 {
     /**
@@ -43,9 +41,6 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
     {
         return [
             <?= implode(",\n            ", $rules) ?>,
-<?php if($generator->timedate):?>
-            [['<?= str_replace(',',"','",$generator->timedate)?>'],'string'],
-<?php endif;?>
         ];
     }
 
@@ -67,13 +62,13 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
      */
     public function search($params)
     {
-        $query = <?= isset($modelAlias) ? $modelAlias : $modelClass ?>::find();
+        $query = DataModel::find();
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-<?php $order=$generator->generateSearchDefaultOrder();if(!empty($order)):?>
+<?php $order=$generator->generateSearchDefaultOrder($model);if(!empty($order)):?>
             'sort' => [
                 'defaultOrder' => [
 <?php foreach ($order as $name=>$value):?>

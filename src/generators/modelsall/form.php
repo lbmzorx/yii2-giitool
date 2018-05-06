@@ -8,6 +8,8 @@ use yii\gii\generators\model\Generator;
 
 echo $form->field($generator, 'only');
 echo $form->field($generator, 'except');
+
+echo $form->field($generator, 'ns');
 echo $form->field($generator, 'ns');
 echo $form->field($generator, 'baseClass');
 echo $form->field($generator, 'db');

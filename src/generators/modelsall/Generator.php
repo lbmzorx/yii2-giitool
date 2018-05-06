@@ -24,7 +24,6 @@ class Generator extends \yii\gii\generators\model\Generator
     public $except;
 
     public $tableName='*';
-
     public $dataNamespace;
     public $timeAdd;
     public $timeUpdate;
@@ -71,9 +70,9 @@ class Generator extends \yii\gii\generators\model\Generator
             [['generateLabelsFromComments', 'useTablePrefix', 'useSchemaName', 'generateQuery', 'generateRelationsFromCurrentSchema'], 'boolean'],
             [['enableI18N'], 'boolean'],
             [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => false],
-            [['only','except','dataNamespace','timeUpdate','timeAdd'],'string'],
+            [['only','except','dataNamespace','timeUpdate','timeAdd',],'string'],
             [['dataNamespace','statusCode','timeUpdate','timeAdd'] , 'filter' , 'filter' => 'trim'] ,
-            [['statusCode','withOneUser','labelExplain','labelTran'] , 'boolean' ,] ,
+            [['statusCode','withOneUser','labelExplain','labelTran',] , 'boolean' ,] ,
         ];
     }
 
@@ -209,7 +208,7 @@ class Generator extends \yii\gii\generators\model\Generator
                 $params['dataNamespace'] = $this->dataNamespace;
                 $files[] = new CodeFile(
                     Yii::getAlias('@' . str_replace('\\' , '/' , ltrim($this->dataNamespace,'\\'))).'\\'.$modelClassName.'.php' ,
-                    $this->render('data-test.php' , $params)
+                    $this->render('data.php' , $params)
                 );
             }
             //translation
