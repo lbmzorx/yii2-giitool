@@ -5,8 +5,8 @@ $modelFullClassName = $className;
 
 $ns=ltrim($generator->ns,"\\");
 $modelFullClassName = $ns. '\\' . $modelFullClassName;
-echo \yii\helpers\VarDumper::dumpAsString($properties);
-//echo \yii\helpers\VarDumper::dumpAsString($tableSchema);
+
+
 echo "<?php\n";
 
 $statusCodes=[];
@@ -15,7 +15,7 @@ $statusCodes=[];
 namespace <?= $generator->dataNamespace?>;
 
 use Yii;
-use <?= $modelFullClassName?> as BaseModel<?=$className?>
+use <?= $modelFullClassName?> as BaseModel<?=$className?>;
 
 /**
 * This is the data class for [[<?= $modelFullClassName ?>]].
@@ -27,15 +27,16 @@ class <?= $className?> extends BaseModel<?=$className."\n"?>
 <?php foreach ($properties as $property):?>
 <?php if(!empty($property['code'])):?>
 
-<?php $code='';$key='';foreach ($property['code'] as $k=>$v):$code.=is_numeric($k)?$k.'=>\''.$v.'\',':'\''.$k.'\'=>'.$v.'\',';$key.=is_numeric($k)?$k.',':'\''.$k.'\',';?>
-    const <?=strtoupper($property['name'])?>_<?=strtoupper(str_replace(' ','_',$v))?>=<?=$k?>;
+<?php $code='';$key='';foreach ($property['code'] as $k=>$v):$code.=is_numeric($k)?$k.'=>\''.$v.'\',':'\''.$k.'\'=>\''.$v.'\',';$key.=is_numeric($k)?$k.',':'\''.$k.'\',';?>
+    const <?=strtoupper($property['name'])?>_<?=strtoupper(str_replace(' ','_',$v))?>=<?=is_numeric($k)?$k:'\''.$k.'\''?>;
 <?php endforeach;?>
     /**
     * <?=$property['label']."\n"?>
     * <?=$property['comment']."\n"?>
     * @var array $<?=$property['name']?>_code
     */
-    public static $<?=$property['name']?>_code = [<?=$code?>];<?php $statusCodes[]=$property['name'];?>
+    public static $<?=$property['name']?>_code = [<?=$code?>];<?php $statusCodes[$property['name']]=$key;?>
+
 <?php endif;?>
 <?php endforeach;?>
 
@@ -44,7 +45,9 @@ class <?= $className?> extends BaseModel<?=$className."\n"?>
      */
     public static function statusCodes(){
         return [
-            '<?=exploded('\',\'',$statusCodes)?>'
+<?php if($statusCodes):?>
+            '<?=implode('\',\'',array_keys($statusCodes))?>'
+<?php endif;?>
         ];
     }
 
@@ -55,14 +58,28 @@ class <?= $className?> extends BaseModel<?=$className."\n"?>
     {
         return array_merge(parent::rules(),[
 <?php if(!empty($statusCodes)):?>
-<?php foreach ($statusCodes as $v):?>
-            [['<?=$v?>'], 'in', 'range' => [<?=$key?>]],
+<?php
+    $keyRanges=[];
+    foreach ($statusCodes as $name=>$v){
+        $keyRanges[$v][]=$name;
+    }
+?>
+<?php foreach ($keyRanges as $k=>$v):?>
+            [['<?=implode('\',\'',$v)?>'], 'in', 'range' => [<?=$k?>]],
 <?php endforeach;?>
 <?php endif;?>
-<?php foreach ($tableSchema->columns as $colum):?>
-<?php if($colum->defaultValue!==null):?>
-            [['<?=$colum->name?>'], 'default', 'value' =><?=is_string($colum->defaultValue)?"'".$colum->defaultValue."'":$colum->defaultValue?>,],
-<?php endif;?>
+<?php
+$defaults=[];
+foreach ($tableSchema->columns as $colum){
+    $value=is_string($colum->defaultValue)?"'".$colum->defaultValue."'":$colum->defaultValue;
+    if($value===null){
+        continue;
+    }
+    $defaults[$value][]=$colum->name;
+}
+?>
+<?php foreach ($defaults as $value=>$colum):?>
+            [['<?=implode('\',\'',$colum)?>'], 'default', 'value' =><?=$value?>,],
 <?php endforeach;?>
         ]);
     }

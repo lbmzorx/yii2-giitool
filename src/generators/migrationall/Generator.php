@@ -26,7 +26,7 @@ class Generator extends BaseGenerator
     public $dataOrderBy='desc';
 
     public $migrationPath = '@app/migrations';
-    public $migrationName;
+    public $migrationName = '';
     public $migrationTime;
 
     public $generateRelations = true;

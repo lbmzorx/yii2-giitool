@@ -742,9 +742,10 @@ class Generator extends BaseGenerator
 
 
 
-    public function generateStatusCodeColum($column){
-        if($this->changeStatus){
-            $changeStatus=explode(',',$this->changeStatus);
+    public function generateStatusCodeColum($column,$model){
+        $class =  trim($this->modelNamespace,'\\').'\\'.$model;
+        if($this->statusCode && method_exists($class,'statusCodes')){
+            $changeStatus=$class::statusCodes();
             if(in_array($column,$changeStatus)){
                 $string="[\n".
                     "               'class'=>\common\components\grid\StatusCodeColumn::className(),\n".

@@ -45,7 +45,7 @@ STYLE
         <?= "<?= " ?>Html::a('<i class="fa fa-plus-square"></i> '.<?= $generator->generateString('Create ' . Inflector::camel2words(StringHelper::basename($model))) ?>, ['create'], ['class' => 'btn btn-success']) ?>
         <?= "<?= " ?>BatchDelete::widget(['name'=>$generator->generateString('Batch Deletes')]) ?>
 <?php if($generator->statusCode):?>
-<?php $changeStatus=$generator->generateGetStatusCode($model); foreach ($changeStatus as $v):?>
+<?php $changeStatus=$generator->generateGetStatusCode($mode); foreach ($changeStatus as $v):?>
         <?= "<?= " ?>BatchUpdate::widget([ 'name'=>\Yii::t('model','<?=Inflector::camel2words($v)?>'),'attribute'=>'<?=$v?>','btnIcon'=>'<?=$v?>', ]) ?>
 <?php endforeach;?>
 <?php endif;?>

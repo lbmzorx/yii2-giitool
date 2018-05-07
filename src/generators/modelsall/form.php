@@ -10,7 +10,6 @@ echo $form->field($generator, 'only');
 echo $form->field($generator, 'except');
 
 echo $form->field($generator, 'ns');
-echo $form->field($generator, 'ns');
 echo $form->field($generator, 'baseClass');
 echo $form->field($generator, 'db');
 echo $form->field($generator, 'useTablePrefix')->checkbox();
@@ -28,7 +27,6 @@ echo $form->field($generator, 'queryBaseClass');
 echo $form->field($generator, 'enableI18N')->checkbox();
 echo $form->field($generator, 'messageCategory');
 echo $form->field($generator, 'useSchemaName')->checkbox();
-echo $form->field($generator, 'messageCategory');
 echo $form->field($generator, 'targetLanguage');
 echo $form->field($generator, 'labelExplain')->checkbox();
 echo $form->field($generator, 'labelTran')->checkbox();

@@ -308,14 +308,14 @@ class Generator extends \yii\gii\generators\model\Generator
         $str=[];
         $commonStr="\n";
         foreach ($classCommon as $v){
-            $commonStr.="\t'{$v}'='{$this->tranAttrs[$v]}',\n";
+            $commonStr.="\t'{$v}'=>'{$this->tranAttrs[$v]}',\n";
         }
         $str['NameCommon']=$commonStr;
 
         foreach ($class as $k=>$v){
             $str[$k]="\n";
             foreach ($v as $vv){
-                $str[$k].="\t'{$vv}'='{$this->tranAttrs[$vv]}',\n";
+                $str[$k].="\t'{$vv}'=>'{$this->tranAttrs[$vv]}',\n";
             }
         }
 
@@ -329,6 +329,8 @@ class Generator extends \yii\gii\generators\model\Generator
                 $file_content.="\n\t/*start*{$k}*/{$v}\t/*end*{$k}*/\n";
             }
         }
+        $file_content=preg_replace('/^[\s\n]+/',"",$file_content);
+        $file_content=preg_replace('/[\s\n]+$/',"",$file_content);
         return new CodeFile(
             $file,
             $this->render('translation.php',['tran'=>$file_content])
@@ -377,14 +379,14 @@ class Generator extends \yii\gii\generators\model\Generator
         $str=[];
         $commonStr="\n";
         foreach ($classCommon as $v){
-            $commonStr.="\t'{$v}'='{$this->statusTrans[$v]}',\n";
+            $commonStr.="\t'{$v}'=>'{$this->statusTrans[$v]}',\n";
         }
         $str['NameCommon']=$commonStr;
 
         foreach ($class as $k=>$v){
             $str[$k]="\n";
             foreach ($v as $vv){
-                $str[$k].="\t'{$vv}'='{$this->statusTrans[$vv]}',\n";
+                $str[$k].="\t'{$vv}'=>'{$this->statusTrans[$vv]}',\n";
             }
         }
 
@@ -398,7 +400,8 @@ class Generator extends \yii\gii\generators\model\Generator
                 $file_content.="\n\t/*start*{$k}*/{$v}\t/*end*{$k}*/\n";
             }
         }
-
+        $file_content=preg_replace('/^[\s\n]+/',"",$file_content);
+        $file_content=preg_replace('/[\s\n]+$/',"",$file_content);
         return new CodeFile(
             $file,
             $this->render('statuscode.php',['tran'=>$file_content])

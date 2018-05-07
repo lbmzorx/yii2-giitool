@@ -21,4 +21,4 @@ echo $form->field($generator, 'disableFkc')->checkbox();
 echo $form->field($generator, 'isSafeUpDown')->checkbox();
 
 echo $form->field($generator, 'dataLimit');
-echo $form->field($generator, 'dataOrderBy')->radioList(['desc','asc']);
+echo $form->field($generator, 'dataOrderBy')->radioList(['desc'=>'desc','asc'=>'asc']);
