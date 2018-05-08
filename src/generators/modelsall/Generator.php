@@ -304,14 +304,15 @@ class Generator extends \yii\gii\generators\model\Generator
             $class[$this->classAttrs[$v]][]=$v;
         }
 
-        //add
-        $str=[];
+        //common label update
         $commonStr="\n";
         foreach ($classCommon as $v){
             $commonStr.="\t'{$v}'=>'{$this->tranAttrs[$v]}',\n";
         }
         $str['NameCommon']=$commonStr;
 
+        //add
+        $str=[];
         foreach ($class as $k=>$v){
             $str[$k]="\n";
             foreach ($v as $vv){
@@ -319,12 +320,15 @@ class Generator extends \yii\gii\generators\model\Generator
             }
         }
 
+        //other label
         foreach ($str as $k=>$v){
             $start='\/\*start\*'.$k.'\*\/';
             $end = '\/\*end\*'.$k.'\*\/';
 
             if(preg_match('/('.$start.')([.\s\S]*)('.$end.')/',$file_content)){
-                $file_content=preg_replace('/('.$start.')([.\s\S]*)('.$end.')/','${1}'.$v."\t".'${3}',$file_content);
+                if($v!="\n"){
+                    $file_content=preg_replace('/('.$start.')([.\s\S]*)('.$end.')/','${1}${2}'.$v."\t".'${3}',$file_content);
+                }
             }else{
                 $file_content.="\n\t/*start*{$k}*/{$v}\t/*end*{$k}*/\n";
             }
@@ -395,7 +399,9 @@ class Generator extends \yii\gii\generators\model\Generator
             $end = '\/\*end\*'.$k.'\*\/';
 
             if(preg_match('/('.$start.')([.\s\S]*)('.$end.')/',$file_content)){
-                $file_content=preg_replace('/('.$start.')([.\s\S]*)('.$end.')/','${1}'.$v."\t".'${3}',$file_content);
+                if($v!="\n"){
+                    $file_content=preg_replace('/('.$start.')([.\s\S]*)('.$end.')/','${1}${2}'.$v."\t".'${3}',$file_content);
+                }
             }else{
                 $file_content.="\n\t/*start*{$k}*/{$v}\t/*end*{$k}*/\n";
             }
