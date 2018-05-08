@@ -69,7 +69,7 @@ STYLE
 <?php
 $count = 0;
 if (($tableSchema = $generator->getTableSchema($model)) === false) {
-    foreach ($generator->getColumnNames() as $name) {
+    foreach ($generator->getColumnNames($model) as $name) {
         if (++$count < 6) {
             echo "            '" . $name . "',\n";
         } else {
@@ -80,10 +80,10 @@ if (($tableSchema = $generator->getTableSchema($model)) === false) {
     foreach ($tableSchema->columns as $column) {
         $format = $generator->generateColumnFormat($column);
 
-        $statusCode = $generator->generateStatusCodeColum($column->name);
+        $statusCode = $generator->generateStatusCodeColum($column->name,$model);
         if($statusCode){
             echo "            " .$statusCode.",\n";
-            $statusCodeList[]=$generator->generateStatusCodeDom($column->name);
+            $statusCodeList[]=$generator->generateStatusCodeDom($column->name,$model);
         }else{
             $datetime=$generator->generateTimeDate($column->name);
             if($datetime){

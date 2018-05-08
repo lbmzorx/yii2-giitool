@@ -44,6 +44,21 @@ class <?= $model ?> extends DataModel
         ];
     }
 
+<?php if($generator->timedate && ($time=$generator->generateTimeSearch($model))):?>
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'searchTime'=>[
+                'class'=>\lbmzorx\components\behaviors\TimeSearch::className(),
+                'timeAttributes' =>['<?=implode('\',\'',$time)?>'],
+             ],
+        ];
+    }
+
+<?php endif?>
     /**
      * @inheritdoc
      */
@@ -57,7 +72,6 @@ class <?= $model ?> extends DataModel
      * Creates data provider instance with search query applied
      *
      * @param array $params
-     *
      * @return ActiveDataProvider
      */
     public function search($params)

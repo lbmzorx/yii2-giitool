@@ -26,6 +26,7 @@ echo $form->field($generator, 'queryClass');
 echo $form->field($generator, 'queryBaseClass');
 echo $form->field($generator, 'enableI18N')->checkbox();
 echo $form->field($generator, 'messageCategory');
+echo $form->field($generator, 'statusCodeMessage');
 echo $form->field($generator, 'useSchemaName')->checkbox();
 echo $form->field($generator, 'targetLanguage');
 echo $form->field($generator, 'labelExplain')->checkbox();

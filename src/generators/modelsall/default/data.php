@@ -151,6 +151,7 @@ foreach ($tableSchema->columns as $colum){
 <?php if(!empty($statusCodes)):?>
             'getStatusCode'=>[
                 'class' => \lbmzorx\components\behaviors\StatusCode::className(),
+                'category' =>'<?=$generator->statusCodeMessage?>',
             ],
 <?php endif;?>
 <?php if($generator->withOneUser):?>

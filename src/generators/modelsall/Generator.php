@@ -33,7 +33,7 @@ class Generator extends \yii\gii\generators\model\Generator
     public $labelExplain=true;
     public $labelTran=true;
     public $targetLanguage='zh-CN';
-
+    public $statusCodeMessage='statuscode';
     /**
      * @inheritdoc
      */
@@ -56,7 +56,7 @@ class Generator extends \yii\gii\generators\model\Generator
     public function rules()
     {
         return [
-            [['db', 'ns', 'dataNamespace', 'queryNs', 'queryClass', 'queryBaseClass'], 'filter', 'filter' => 'trim'],
+            [['db', 'ns', 'dataNamespace', 'queryNs', 'queryClass', 'queryBaseClass','statusCodeMessage'], 'filter', 'filter' => 'trim'],
             [['ns', 'queryNs','dataNamespace'], 'filter', 'filter' => function ($value) { return trim($value, '\\'); }],
 //            [['db', 'ns', 'baseClass',], 'required'],
             [['db', 'queryClass'], 'match', 'pattern' => '/^\w+$/', 'message' => 'Only word characters are allowed.'],
@@ -70,6 +70,7 @@ class Generator extends \yii\gii\generators\model\Generator
             [['generateLabelsFromComments', 'useTablePrefix', 'useSchemaName', 'generateQuery', 'generateRelationsFromCurrentSchema'], 'boolean'],
             [['enableI18N'], 'boolean'],
             [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => false],
+            [['statusCodeMessage'], 'validateStatusCodeMessageCategory', 'skipOnEmpty' => false],
             [['only','except','dataNamespace','timeUpdate','timeAdd',],'string'],
             [['dataNamespace','statusCode','timeUpdate','timeAdd'] , 'filter' , 'filter' => 'trim'] ,
             [['statusCode','withOneUser','labelExplain','labelTran',] , 'boolean' ,] ,
@@ -111,6 +112,9 @@ class Generator extends \yii\gii\generators\model\Generator
             'labelExplain'=>'Table commit be used to explain label',
             'labelTran'=>'Tanslation label to translation file',
             'targetLanguage'=>'Translation label to target language by used table comments',
+            'statusCodeMessage'=>'Status Code can be tran into target language with column of table comment like 
+                <code>状态.tran:0=,1=冻结.code:0=Delete,1=Freeze.</code> 
+                 It will tran as <code>\'Delete\'=>\'删除\',\'Freeze\'=>\'冻结\'</code> ',
         ]);
     }
 
@@ -120,7 +124,13 @@ class Generator extends \yii\gii\generators\model\Generator
     public function stickyAttributes()
     {
         return array_merge(parent::stickyAttributes(), [
-            'only', 'except', 'statusCode','withOneUser','labelExplain','labelTran','targetLanguage']);
+            'only', 'except', 'statusCode','withOneUser','labelExplain','labelTran','targetLanguage','statusCodeMessage']);
+    }
+
+    public function validateStatusCodeMessageCategory(){
+        if ($this->enableI18N && empty($this->statusCodeMessage)) {
+            $this->addError('statusCodeMessage', "Status Code Message Category cannot be blank.");
+        }
     }
 
 
@@ -347,7 +357,7 @@ class Generator extends \yii\gii\generators\model\Generator
 
         $messageCategory=\Yii::$app->i18n->translations[$this->messageCategory];
         $basepath=isset($messageCategory['basePath'])?$messageCategory['basePath']:'@app/messages';
-        $file = Yii::getAlias($basepath).'/'.$this->targetLanguage.'/'.'statusCode.php';
+        $file = Yii::getAlias($basepath).'/'.$this->targetLanguage.'/'.($this->statusCodeMessage).'.php';
 
         $file_content='';
         $classAttrs=array_diff(array_keys($this->classStatus),array_keys($this->commonStatus));

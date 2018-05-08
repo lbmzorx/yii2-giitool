@@ -293,7 +293,7 @@ class Generator extends BaseGenerator
             }
         }
         /* @var $class \yii\db\ActiveRecord */
-        $class = $this->modelClass;
+        $class = trim($this->modelNamespace,'\\').'\\'.$model;
         $pk = $class::primaryKey();
 
         return $pk[0];
@@ -339,7 +339,7 @@ class Generator extends BaseGenerator
             $status=explode(',',$this->changeStatus);
             foreach ($status as $s){
                 if($s==$column->name){
-                    $className=StringHelper::basename($this->modelClass);
+                    $className=StringHelper::basename($model);
                     return "\$form->field(\$model, '$attribute')->dropDownList(StatusCode::tranStatusCode({$className}::\${$column->name}_code,'{$this->messageCategory}'),['prompt'=>\\Yii::t('{$this->messageCategory}','Please Select')])";
                 }
             }
@@ -473,12 +473,24 @@ class Generator extends BaseGenerator
             foreach ($class::statusCodes() as $status){
                 $status=$status.'_code';
                 if(isset($class::${$status})){
-                    $rules[] = "[['" .$status. "'],'in','range'=>{$model}::\${$status}_code]";
+                    $rules[] = "[['" .$status. "'], 'in', 'range'=>array_keys( DataModel::\${$status}_code ) ]";
                 }
             }
         }
 
         return $rules;
+    }
+
+    public function generateTimeSearch($model){
+        $timeDate=[];
+        if (($table = $this->getTableSchema($model)) !== false) {
+            foreach ($table->columns as $column) {
+                if($this->timedate && preg_match('/(\w+_time)|(\w+d_at)/',$column->name)){
+                    $timeDate[] = $column->name;
+                }
+            }
+        }
+        return $timeDate;
     }
 
     /**
@@ -544,6 +556,8 @@ class Generator extends BaseGenerator
 
         $likeConditions = [];
         $hashConditions = [];
+        $timeDate=$this->generateTimeSearch($modelName);
+
         foreach ($columns as $column => $type) {
             switch ($type) {
                 case Schema::TYPE_SMALLINT:
@@ -558,6 +572,9 @@ class Generator extends BaseGenerator
                 case Schema::TYPE_TIME:
                 case Schema::TYPE_DATETIME:
                 case Schema::TYPE_TIMESTAMP:
+                    if(in_array($column,$timeDate)){
+                        continue;
+                    }
                     $hashConditions[] = "'{$column}' => \$this->{$column},";
                     break;
                 default:
@@ -750,7 +767,7 @@ class Generator extends BaseGenerator
                 $string="[\n".
                     "               'class'=>\common\components\grid\StatusCodeColumn::className(),\n".
                     "               'attribute'=>'{$column}',\n".
-                    "               'filter'=>\common\components\behaviors\StatusCode::tranStatusCode({$this->modelClass}::\${$column}_code,'{$this->messageCategory}'),\n".
+                    "               'filter'=>\common\components\behaviors\StatusCode::tranStatusCode({$model}::\${$column}_code,'{$this->messageCategory}'),\n".
                     "               'value'=> function (\$model) {\n".
                     "                   return Html::button(\$model->getStatusCode('{$column}','{$column}_code'),\n".
                     "                       ['data-id'=>\$model->id,'class'=>'{$column}-change btn btn-xs btn-'.\$model->getStatusCss('{$column}','{$column}_css',\$model->{$column})]);\n".
@@ -802,7 +819,7 @@ class Generator extends BaseGenerator
         }
     }
 
-    public function generateStatusCodeDom($column){
+    public function generateStatusCodeDom($column,$model){
         $string=
             <<<DOM
 <div id="{$column}-change-dom" style="display: none;">
@@ -810,12 +827,12 @@ class Generator extends BaseGenerator
         <?=Html::beginForm(['change-status'],'post')?>
         <input type="hidden" name="key" value="{$column}">
         <input type="hidden" name="id" value="">
-        <?php foreach ( {$this->modelClass}::\${$column}_code as \$k=>\$v):?>           
+        <?php foreach ( {$model}::\${$column}_code as \$k=>\$v):?>           
             <label class="checkbox-inline" style="margin: 5px 10px;">
                 <?php
                     \$css='warning';
-                    if( isset({$this->modelClass}::\${$column}_css) && isset({$this->modelClass}::\${$column}_css[\$k])){
-                        \$css = {$this->modelClass}::\${$column}_css [\$k];
+                    if( isset({$model}::\${$column}_css) && isset({$model}::\${$column}_css[\$k])){
+                        \$css = {$model}::\${$column}_css [\$k];
                     }else{
                         \$css=isset(\common\components\behaviors\StatusCode::\$cssCode[\$k])?\common\components\behaviors\StatusCode::\$cssCode[\$k]:\$css;
                     }
