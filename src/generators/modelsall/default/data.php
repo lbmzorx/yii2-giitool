@@ -150,14 +150,14 @@ foreach ($tableSchema->columns as $colum){
 <?php endif;?>
 <?php if(!empty($statusCodes)):?>
             'getStatusCode'=>[
-                'class' => \lbmzorx\components\behaviors\StatusCode::className(),
+                'class' => \lbmzorx\components\behavior\StatusCode::className(),
                 'category' =>'<?=$generator->statusCodeMessage?>',
             ],
 <?php endif;?>
 <?php if($generator->withOneUser):?>
 <?php if(array_key_exists('user_id',$labels)):?>
             'withOneUser'=>[
-                'class' => \lbmzorx\components\behaviors\WithOneUser::className(),
+                'class' => \lbmzorx\components\behavior\WithOneUser::className(),
                 'userClass'=> User::ClassName(),
             ],
 <?php endif;?>

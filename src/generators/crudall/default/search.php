@@ -20,12 +20,12 @@ $searchConditions = $generator->generateSearchConditions($model);
 echo "<?php\n";
 ?>
 
-namespace <?= StringHelper::dirname(ltrim($generator->searchNamespace, '\\')) ?>;
+namespace <?= ltrim($generator->searchNamespace, '\\')?>;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use lbmzorx\components\events\SearchEvent;
+use lbmzorx\components\event\SearchEvent;
 use <?=trim($generator->modelNamespace,'\\').'\\'.$model?> as DataModel;
 
 /**
@@ -52,7 +52,7 @@ class <?= $model ?> extends DataModel
     {
         return [
             'searchTime'=>[
-                'class'=>\lbmzorx\components\behaviors\TimeSearch::className(),
+                'class'=>\lbmzorx\components\behavior\TimeSearch::className(),
                 'timeAttributes' =>['<?=implode('\',\'',$time)?>'],
              ],
         ];

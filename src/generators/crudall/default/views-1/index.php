@@ -55,7 +55,7 @@ STYLE
     <?= "<?= " ?>GridView::widget([
         'dataProvider' => $dataProvider,
         'page' =>[
-            'class'=>\lbmzorx\components\widgets\JumpPager::className(),
+            'class'=>\lbmzorx\components\widget\JumpPager::className(),
             'firstPageLabel'=>Yii::t('lbmzorx','first'),
             'nextPageLabel'=>Yii::t('lbmzorx','next'),
             'prevPageLabel'=>Yii::t('lbmzorx','prev'),

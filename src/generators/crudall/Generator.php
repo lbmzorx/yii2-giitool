@@ -200,7 +200,7 @@ class Generator extends BaseGenerator
 //            try{
                 $searchModel='';
                 if (!empty($this->searchNamespace)) {
-                    $searchModel = Yii::getAlias('@' . str_replace('\\', '/', ltrim($this->searchNamespace, '\\') .$model. '.php'));
+                    $searchModel = Yii::getAlias('@' . str_replace('\\', '/', ltrim($this->searchNamespace, '\\') .'/'.$model. '.php'));
                     $files[] = new CodeFile($searchModel, $this->render('search.php',['generator'=>$this,'model'=>$model]));
                     $searchModel = $model;
                 }
@@ -261,7 +261,7 @@ class Generator extends BaseGenerator
     {
 
         $viewpath=StringHelper::dirname(ltrim($this->namespace, '\\'));
-        return Yii::getAlias(str_replace('\\', '/',$viewpath).'/views/'.$this->getControllerID($controller));
+        return Yii::getAlias('@'.str_replace('\\', '/',$viewpath).'/views/'.$this->getControllerID($controller));
     }
 
     /**
@@ -471,9 +471,9 @@ class Generator extends BaseGenerator
         $class= trim($this->modelNamespace,'\\').'\\'.$model;
         if(method_exists($class,'statusCodes')){
             foreach ($class::statusCodes() as $status){
-                $status=$status.'_code';
-                if(isset($class::${$status})){
-                    $rules[] = "[['" .$status. "'], 'in', 'range'=>array_keys( DataModel::\${$status}_code ) ]";
+                $status_code=$status.'_code';
+                if(isset($class::${$status_code})){
+                    $rules[] = "[['" .$status. "'], 'in', 'range'=>array_keys( DataModel::\${$status_code} ) ]";
                 }
             }
         }
@@ -765,12 +765,15 @@ class Generator extends BaseGenerator
             $changeStatus=$class::statusCodes();
             if(in_array($column,$changeStatus)){
                 $string="[\n".
-                    "               'class'=>\common\components\grid\StatusCodeColumn::className(),\n".
+                    "               'class'=>\\lbmzorx\\components\\grid\\StatusCodeColumn::className(),\n".
                     "               'attribute'=>'{$column}',\n".
-                    "               'filter'=>\common\components\behaviors\StatusCode::tranStatusCode({$model}::\${$column}_code,'{$this->messageCategory}'),\n".
+                    "               'filter'=>StatusCode::tranStatusCode({$model}::\${$column}_code,'{$this->messageCategory}'),\n".
                     "               'value'=> function (\$model) {\n".
                     "                   return Html::button(\$model->getStatusCode('{$column}','{$column}_code'),\n".
-                    "                       ['data-id'=>\$model->id,'class'=>'{$column}-change btn btn-xs btn-'.\$model->getStatusCss('{$column}','{$column}_css',\$model->{$column})]);\n".
+                    "                       [\n".
+                    "                           'data-id'=>\$model->id,\n".
+                    "                           'class'=>'{$column}-change btn btn-xs btn-'.\$model->getStatusCss('{$column}','{$column}_css',\$model->{$column})\n".
+                    "                       ]);\n".
                     "               },\n".
                     "               'format'=>'raw',\n".
                     "            ]";
@@ -801,7 +804,7 @@ class Generator extends BaseGenerator
             $timedate=explode(',',$this->timedate);
             if(in_array($column,$timedate)){
                 $string="[\n".
-                    "               'class'=>\common\components\grid\DateTimeColumn::className(),\n".
+                    "               'class'=>\\lbmzorx\\components\\grid\\DateTimeColumn::className(),\n".
                     "               'attribute'=>'{$column}',\n".
                     "            ]";
                 return $string;
@@ -834,7 +837,7 @@ class Generator extends BaseGenerator
                     if( isset({$model}::\${$column}_css) && isset({$model}::\${$column}_css[\$k])){
                         \$css = {$model}::\${$column}_css [\$k];
                     }else{
-                        \$css=isset(\common\components\behaviors\StatusCode::\$cssCode[\$k])?\common\components\behaviors\StatusCode::\$cssCode[\$k]:\$css;
+                        \$css=isset(StatusCode::\$cssCode[\$k])?StatusCode::\$cssCode[\$k]:\$css;
                     }
                 ?>               
                 <?=Html::input('radio','value',\$k)?>

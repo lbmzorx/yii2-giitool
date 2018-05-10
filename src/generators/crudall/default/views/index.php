@@ -15,9 +15,10 @@ echo "<?php\n";
 use yii\helpers\Html;
 use lbmzorx\components\widget\BatchDelete;
 use <?= $generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\widgets\\ListView" ?>;
-<?= $generator->enablePjax ? 'use yii\widgets\Pjax;' : '' ?>
-<?=$generator->statusCode? "use lbmzorx\\components\\widgets\\BatchUpdate;":''?>
-
+<?= $generator->enablePjax ? "use yii\widgets\Pjax;\n" : "\n" ?>
+<?=$generator->statusCode? "use lbmzorx\\components\\widget\\BatchUpdate;\n":"\n"?>
+<?=$generator->searchNamespace? "use $generator->searchNamespace\\{$model};\n":"{$generator->modelNamespace}\n"?>
+<?=($generator->statusCode)?"use lbmzorx\\components\\behavior\\StatusCode;\n":"\n"?>
 
 /* @var $this yii\web\View */
 /* @var $searchModel <?=ltrim($generator->searchNamespace, '\\').'\\'.$model. " */\n"?>
@@ -25,7 +26,7 @@ use <?= $generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\w
 
 $this->title = <?= $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($model)))) ?>;
 $this->params['breadcrumbs'][] = $this->title;
-$this->registerCss(\<\<\<\STYLE
+$this->registerCss(<?='<<<'?>STYLE
         p .btn{margin-top:5px;}
 STYLE
 );
@@ -43,7 +44,7 @@ STYLE
 
     <p>
         <?= "<?= " ?>Html::a('<i class="fa fa-plus-square"></i> '.<?= $generator->generateString('Create ' . Inflector::camel2words(StringHelper::basename($model))) ?>, ['create'], ['class' => 'btn btn-success']) ?>
-        <?= "<?= " ?>BatchDelete::widget(['name'=>$generator->generateString('Batch Deletes')]) ?>
+        <?= "<?= " ?>BatchDelete::widget(['name'=><?=$generator->generateString('Batch Deletes')?>]) ?>
 <?php if($generator->statusCode):?>
 <?php $changeStatus=$generator->generateGetStatusCode($model); foreach ($changeStatus as $v):?>
         <?= "<?= " ?>BatchUpdate::widget([ 'name'=>\Yii::t('model','<?=Inflector::camel2words($v)?>'),'attribute'=>'<?=$v?>','btnIcon'=>'<?=$v?>', ]) ?>
@@ -54,14 +55,14 @@ STYLE
 <?php if ($generator->indexWidgetType === 'grid'): ?>
     <?= "<?= " ?>GridView::widget([
         'dataProvider' => $dataProvider,
-        'page' =>[
-            'class'=>\lbmzorx\components\widgets\JumpPager::className(),
-            'firstPageLabel'=>Yii::t('lbmzorx','first'),
-            'nextPageLabel'=>Yii::t('lbmzorx','next'),
-            'prevPageLabel'=>Yii::t('lbmzorx','prev'),
-            'lastPageLabel'=>Yii::t('lbmzorx','last'),
-            'jButtonLabel' =>Yii::t('lbmzorx','Jump'),
-            'sButtonLabel' =>Yii::t('lbmzorx','PageSize'),
+        'pager' =>[
+            'class'=>\lbmzorx\components\widget\JumpPager::className(),
+            'firstPageLabel'=>Yii::t('app','first'),
+            'nextPageLabel'=>Yii::t('app','next'),
+            'prevPageLabel'=>Yii::t('app','prev'),
+            'lastPageLabel'=>Yii::t('app','last'),
+            'jButtonLabel' =>Yii::t('app','Jump'),
+            'sButtonLabel' =>Yii::t('app','PageSize'),
         ],
         <?= !empty($generator->searchModelClass) ? "'filterModel' => \$searchModel,\n        'columns' => [\n" : "'columns' => [\n"; ?>
             ['class' => 'yii\grid\CheckboxColumn'],
@@ -127,7 +128,7 @@ if (($tableSchema = $generator->getTableSchema($model)) === false) {
 <?php
     if(!empty($statusCodeList)){
         foreach ($statusCodeList as $v){
-            echo $v;
+            echo $v."\n";
         }
     }
 ?>

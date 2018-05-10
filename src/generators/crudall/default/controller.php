@@ -13,7 +13,7 @@ $modelNamespace= $generator->modelNamespace;
 echo "<?php\n";
 ?>
 
-namespace <?= StringHelper::dirname(ltrim($generator->namespace, '\\')) ?>;
+namespace <?= ltrim($generator->namespace, '\\')?>;
 
 use Yii;
 use <?=$baseCtrlNs.'\\'.$baseCtrlNsClass?>;

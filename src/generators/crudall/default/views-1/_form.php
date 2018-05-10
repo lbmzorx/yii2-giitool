@@ -20,7 +20,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use <?=$generator->modelClass?>;
 <?php if($generator->changeStatus):?>
-use common\components\behaviors\StatusCode;
+use common\components\behavior\StatusCode;
 <?php endif;?>
 /* @var $this yii\web\View */
 /* @var $model <?= ltrim($generator->modelClass, '\\') ?> */

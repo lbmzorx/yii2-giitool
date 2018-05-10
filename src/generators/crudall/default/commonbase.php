@@ -22,13 +22,13 @@ use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 <?php endif;?>
 use <?= ltrim($generator->baseControllerClass, '\\') ?>;
-use lbmzorx\components\actions\CreateAction;
-use lbmzorx\components\actions\ViewAction;
-use lbmzorx\components\actions\UpdateAction;
-use lbmzorx\components\actions\IndexAction;
-use lbmzorx\components\actions\DeleteAction;
-use lbmzorx\components\actions\SortAction;
-use lbmzorx\components\actions\ChangeStatusAction;
+use lbmzorx\components\action\CreateAction;
+use lbmzorx\components\action\ViewAction;
+use lbmzorx\components\action\UpdateAction;
+use lbmzorx\components\action\IndexAction;
+use lbmzorx\components\action\DeleteAction;
+use lbmzorx\components\action\SortAction;
+use lbmzorx\components\action\ChangeStatusAction;
 
 /**
  * <?= $baseCtrlNsClass ?> implements the CRUD actions as base
@@ -117,7 +117,7 @@ class <?= $baseCtrlNsClass ?> extends <?= StringHelper::basename($generator->bas
                     'class' => IndexAction::className(),
                     'data' => function(){
                         $searchModel = new $this->modelNameIndexSearch();
-                        $dataProvider = $searchModel->search(yii::$app->getRequest()->getQueryParams());
+                        $dataProvider = $searchModel->search(Yii::$app->getRequest()->getQueryParams());
                         return [
                             'dataProvider' => $dataProvider,
                             'searchModel' => $searchModel,
