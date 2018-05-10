@@ -13,12 +13,12 @@ echo "<?php\n";
 ?>
 
 use yii\helpers\Html;
-use lbmzorx\components\widget\BatchDelete;
 use <?= $generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\widgets\\ListView" ?>;
-<?= $generator->enablePjax ? "use yii\widgets\Pjax;\n" : "\n" ?>
+<?= $generator->enablePjax ? "use yii\\widgets\\Pjax;\n" : "\n" ?>
 <?=$generator->statusCode? "use lbmzorx\\components\\widget\\BatchUpdate;\n":"\n"?>
 <?=$generator->searchNamespace? "use $generator->searchNamespace\\{$model};\n":"{$generator->modelNamespace}\n"?>
 <?=($generator->statusCode)?"use lbmzorx\\components\\behavior\\StatusCode;\n":"\n"?>
+use lbmzorx\components\widget\BatchDelete;
 
 /* @var $this yii\web\View */
 /* @var $searchModel <?=ltrim($generator->searchNamespace, '\\').'\\'.$model. " */\n"?>
@@ -39,7 +39,32 @@ STYLE
         <div class="panel-body">
 <?= $generator->enablePjax ? "    <?php Pjax::begin(); ?>\n" : '' ?>
 <?php if(!empty($generator->searchNamespace)): ?>
-<?= "    <?php " . ($generator->indexWidgetType === 'grid' ? "// " : "") ?>echo $this->render('_search', ['model' => $searchModel]); ?>
+    <p>
+        <?='<?'?>=Html::button(Yii::t('app','Search button').'  '.Html::tag('i','',['class'=>'fa fa-chevron-down']),['class'=>'btn btn-success ','id'=>'search-button'])?>
+        <?="<?php\n"?>
+        $this->registerJs(<?="<<<"?>str
+var show=false;
+$('#search-button').click(function(){
+    if(show==true){
+        $('#search-button').find('i').addClass('fa-chevron-down');
+        $('#search-button').find('i').removeClass('fa-chevron-up');
+        show=false;
+    }else{
+        $('#search-button').find('i').removeClass('fa-chevron-down');
+        $('#search-button').find('i').addClass('fa-chevron-up');
+        show=true;
+    }
+    $('#search-panel').toggle('fast');
+});
+str
+);
+        ?>
+    </p>
+    <div class="panel panel-success" id="search-panel" style="display: none">
+        <div class="panel-body">
+            <?='<?php'?>  echo $this->render('_search', ['model' => $searchModel]); ?>
+        </div>
+    </div>
 <?php endif; ?>
 
     <p>

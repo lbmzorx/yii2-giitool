@@ -214,7 +214,7 @@ class Generator extends BaseGenerator
                 $viewPath = $this->getViewPath($controller);
                 $templatePath = $this->getTemplatePath() . '/views';
                 foreach (scandir($templatePath) as $file) {
-                    if (empty($this->searchModelClass) && $file === '_search.php') {
+                    if (empty($this->searchNamespace) && $file === '_search.php') {
                         continue;
                     }
                     if (is_file($templatePath . '/' . $file) && pathinfo($file, PATHINFO_EXTENSION) === 'php') {
@@ -380,11 +380,24 @@ class Generator extends BaseGenerator
     public function generateActiveSearchField($model,$attribute)
     {
         $tableSchema = $this->getTableSchema($model);
-        if ($tableSchema === false) {
+
+        if ($tableSchema === false || !isset($tableSchema->columns[$attribute])) {
+            if (preg_match('/^(password|pass|passwd|passcode)$/i', $attribute)) {
+                return '';
+            }
             return "\$form->field(\$model, '$attribute')";
         }
 
         $column = $tableSchema->columns[$attribute];
+        $class = trim($this->modelNamespace,'\\').'\\'.$model;
+        if(method_exists($class,'statusCodes')){
+            $statusCode=$class::statusCodes();
+            if(in_array($attribute,$statusCode)){
+                return "\$form->field(\$model, '$attribute')->dropDownList(StatusCode::tranStatusCode( SearchModel::\${$attribute}_code,'{$this->messageCategory}'),
+                ['prompt'=>\\Yii::t('{$this->messageCategory}','Please Select')])";
+            }
+        }
+
         if ($column->phpType === 'boolean') {
             return "\$form->field(\$model, '$attribute')->checkbox()";
         }

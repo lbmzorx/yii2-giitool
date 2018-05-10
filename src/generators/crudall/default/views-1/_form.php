@@ -60,7 +60,7 @@ use common\components\behavior\StatusCode;
             echo "\t<div class=\"col-lg-3 col-sm-3\">\n";
             echo "\t    <?= " . $generator->generateActiveField($attribute) . " ?>\n";
             echo "\t</div>\n";
-        }elseif($count>=3){
+        }elseif($count>=4){
             $count=0;
             echo "\t<div class=\"col-lg-3 col-sm-3\">\n";
             echo "\t    <?= " . $generator->generateActiveField($attribute) . " ?>\n";
