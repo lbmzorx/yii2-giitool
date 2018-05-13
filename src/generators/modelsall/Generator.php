@@ -426,8 +426,6 @@ class Generator extends \yii\gii\generators\model\Generator
     }
 
 
-
-
     protected $timeAdds=[];
     public function generateTimeAdd($colums){
         if($this->timeAdd && empty($this->timeAdds)){
@@ -457,34 +455,40 @@ class Generator extends \yii\gii\generators\model\Generator
         $label='';
         if( $point=mb_strpos($comment,'.')){
             $label = mb_substr($comment,0,$point);
-            if(preg_match('/\.code:(?P<code>[\w\s\=\,_]+)/',mb_substr($comment,$point),$match)){
-                if(isset($match['code'])){
-                    foreach (explode(',',$match['code']) as $v){
-                        $tmp=explode('=',$v);
-                        if(isset($tmp[0])&&isset($tmp[1])){
-                            $code[trim($tmp[0])]=trim($tmp[1]);
+            $other =mb_substr($comment,$point);
+
+            $others = array_filter(explode('.',$other));
+            foreach ($others as $v){
+                if( $split=mb_strpos($v,':')){
+                    $name=mb_substr($v,0,$split);
+                    $contents=trim(mb_substr($v,$split),':');
+                    if($name=='commit'){
+                        $commit=$contents;
+                        continue;
+                    }
+//                    throw new Exception(VarDumper::dumpAsString($contents.mb_strpos('=',$contents)));
+                    if(mb_strpos($contents,'=')!==false){
+                        $contents=array_filter(explode(',',$contents));
+                        foreach ($contents as $k=>$content){
+                            $tmp=explode('=',$content);
+                            if(isset($tmp[0])&&isset($tmp[1])){
+                                if($name=='code'){
+                                    $code[trim($tmp[0])]=trim($tmp[1]);
+                                }elseif($name=='tran'){
+                                    $tran[trim($tmp[0])]=trim($tmp[1]);
+                                }
+                            }
                         }
                     }
+
                 }
-            }
-            if(preg_match('/\.tran:(?P<tran>((?!\.)[\W\w\s\=\,])+)/',mb_substr($comment,$point),$match)){
-                if(isset($match['tran'])){
-                    $match['tran']=str_replace('，',',',$match['tran']);
-                    foreach (explode(',',$match['tran']) as $v){
-                        $tmp=explode('=',$v);
-                        if(isset($tmp[0])&&isset($tmp[1])){
-                            $tran[trim($tmp[0])]=trim($tmp[1]);
-                        }
-                    }
-                }
-            }
-            if(preg_match('/\.commit:(?P<commit>((?!\.)[\W\w\s\=\,])+)/',mb_substr($comment,$point),$match)){
-                $commit=isset($match['commit'])?$match['commit']:$label;
             }
         }else{
             $commit=$comment;
             $label=$comment;
         }
+
+
         return [$code,$tran,$commit,$label];
     }
 

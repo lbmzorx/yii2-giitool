@@ -335,9 +335,9 @@ class Generator extends BaseGenerator
             return "\$form->field(\$model, '$attribute')->checkbox()";
         }
 
-        if($this->changeStatus){
-            $status=explode(',',$this->changeStatus);
-            foreach ($status as $s){
+        if($this->statusCode){
+            $statusCodes=$this->generateGetStatusCode($model);
+            foreach ($statusCodes as $s){
                 if($s==$column->name){
                     $className=StringHelper::basename($model);
                     return "\$form->field(\$model, '$attribute')->dropDownList(StatusCode::tranStatusCode({$className}::\${$column->name}_code,'{$this->messageCategory}'),['prompt'=>\\Yii::t('{$this->messageCategory}','Please Select')])";
@@ -381,11 +381,48 @@ class Generator extends BaseGenerator
     {
         $tableSchema = $this->getTableSchema($model);
 
+        if($this->timedate && preg_match('/(\w+_time)|(\w+d_at)/',$attribute)){
+            $fieldtextInput=<<<str
+\$form->field(\$model, '{$attribute}',[
+            'class'=>\\lbmzorx\\components\\widget\\InputAddField::className(),
+            'firstContent'=>\$model->getAttributeLabel('{$attribute}'),
+            'isTime'=>true,
+            'timeType'=>'datetime',
+            'dateConfig'=>[
+                'range'=>'~',
+            ],
+            'isTips'=>true,
+            'tipsType'=>'layer',
+            'firstOption'=>['id'=>'icon-show-'.\\yii\\helpers\\StringHelper::basename(get_class(\$model)).'-{$attribute}'],
+        ])->textInput(['maxlength' => true])
+        ->label('');
+str;
+        }else{
+            $fieldtextInput=<<<str
+\$form->field(\$model, '{$attribute}',[
+            'class'=>\\lbmzorx\\components\\widget\\InputAddField::className(),
+            'firstContent'=>\$model->getAttributeLabel('{$attribute}'),
+            'firstOption'=>['id'=>'icon-show-'.\\yii\\helpers\\StringHelper::basename(get_class(\$model)).'-{$attribute}'],
+        ])->textInput(['maxlength' => true])
+        ->label('');
+str;
+        }
+
+        $fielddropInput=<<<str
+\$form->field(\$model, '{$attribute}',[
+            'class'=>\\lbmzorx\\components\\widget\\InputAddField::className(),
+            'firstContent'=>\$model->getAttributeLabel('{$attribute}'),
+            'firstOption'=>['id'=>'icon-show-'.\\yii\\helpers\\StringHelper::basename(get_class(\$model)).'-{$attribute}'],
+        ])->dropDownList(StatusCode::tranStatusCode( SearchModel::\${$attribute}_code,'{$this->messageCategory}'),['prompt'=>\\Yii::t('{$this->messageCategory}','Please Select')])
+        ->label('');
+str;
+
+
         if ($tableSchema === false || !isset($tableSchema->columns[$attribute])) {
             if (preg_match('/^(password|pass|passwd|passcode)$/i', $attribute)) {
                 return '';
             }
-            return "\$form->field(\$model, '$attribute')";
+            return $fieldtextInput;
         }
 
         $column = $tableSchema->columns[$attribute];
@@ -393,8 +430,7 @@ class Generator extends BaseGenerator
         if(method_exists($class,'statusCodes')){
             $statusCode=$class::statusCodes();
             if(in_array($attribute,$statusCode)){
-                return "\$form->field(\$model, '$attribute')->dropDownList(StatusCode::tranStatusCode( SearchModel::\${$attribute}_code,'{$this->messageCategory}'),
-                ['prompt'=>\\Yii::t('{$this->messageCategory}','Please Select')])";
+                return $fielddropInput;
             }
         }
 
@@ -402,7 +438,7 @@ class Generator extends BaseGenerator
             return "\$form->field(\$model, '$attribute')->checkbox()";
         }
 
-        return "\$form->field(\$model, '$attribute')";
+        return $fieldtextInput;
     }
 
     /**
@@ -785,6 +821,7 @@ class Generator extends BaseGenerator
                     "                   return Html::button(\$model->getStatusCode('{$column}','{$column}_code'),\n".
                     "                       [\n".
                     "                           'data-id'=>\$model->id,\n".
+                    "                           'data-value'=>\$model->{$column},\n".
                     "                           'class'=>'{$column}-change btn btn-xs btn-'.\$model->getStatusCss('{$column}','{$column}_css',\$model->{$column})\n".
                     "                       ]);\n".
                     "               },\n".
@@ -796,9 +833,9 @@ class Generator extends BaseGenerator
         return false;
     }
 
-    public function generateStatusCodeRow($column){
-        if($this->changeStatus){
-            $changeStatus=explode(',',$this->changeStatus);
+    public function generateStatusCodeRow($model,$column){
+        if($this->statusCode){
+            $changeStatus=$this->generateGetStatusCode($model);
             if(in_array($column,$changeStatus)){
                 $string=
                     "            [\n".

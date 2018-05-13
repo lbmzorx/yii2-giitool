@@ -24,9 +24,13 @@ if(method_exists($class,'statusCodes')){
 /* @var $this yii\web\View */
 /* @var $model <?= ltrim($generator->searchNamespace, '\\').'\\'.$model ?> */
 /* @var $form yii\widgets\ActiveForm */
+$this->registerCss(<?='<<<'?>STYLE
+.search-box .form-group{margin-bottom: 5px;line-height:0.2}
+STYLE
+        );
 ?>
 
-<div class="<?= Inflector::camel2id(StringHelper::basename($model)) ?>-search">
+<div class="<?= Inflector::camel2id(StringHelper::basename($model)) ?>-search search-box">
 
     <?= "<?php " ?>$form = ActiveForm::begin([
         'action' => ['index'],
@@ -47,7 +51,7 @@ foreach ($generator->getColumnNames($model) as $attribute) {
         echo "\t<div class=\"col-lg-2 col-sm-2\">\n";
         echo "\t\t".$str."\n";
         echo "\t</div>\n";
-    } elseif($count>=5) {
+    } elseif($count>=6) {
         $count=0;
         echo "\t<div class=\"col-lg-2 col-sm-2\">\n";
         echo "\t\t".$str."\n";
