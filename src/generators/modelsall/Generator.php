@@ -34,6 +34,9 @@ class Generator extends \yii\gii\generators\model\Generator
     public $labelTran=true;
     public $targetLanguage='zh-CN';
     public $statusCodeMessage='statuscode';
+
+    public $relation=true;
+
     /**
      * @inheritdoc
      */
@@ -73,7 +76,7 @@ class Generator extends \yii\gii\generators\model\Generator
             [['statusCodeMessage'], 'validateStatusCodeMessageCategory', 'skipOnEmpty' => false],
             [['only','except','dataNamespace','timeUpdate','timeAdd',],'string'],
             [['dataNamespace','statusCode','timeUpdate','timeAdd'] , 'filter' , 'filter' => 'trim'] ,
-            [['statusCode','withOneUser','labelExplain','labelTran',] , 'boolean' ,] ,
+            [['statusCode','withOneUser','labelExplain','labelTran','relation',] , 'boolean' ,] ,
         ];
     }
 
@@ -93,6 +96,7 @@ class Generator extends \yii\gii\generators\model\Generator
             'labelExplain'=>'Table commit be used to explain label',
             'labelTran'=>'Tanslation label to translation file',
             'targetLanguage'=>'Translation label to target language by used table comments',
+            'relation'=>'Analysis relation except of Foreign key',
         ]);
     }
 
@@ -115,6 +119,7 @@ class Generator extends \yii\gii\generators\model\Generator
             'statusCodeMessage'=>'Status Code can be tran into target language with column of table comment like 
                 <code>状态.tran:0=,1=冻结.code:0=Delete,1=Freeze.</code> 
                  It will tran as <code>\'Delete\'=>\'删除\',\'Freeze\'=>\'冻结\'</code> ',
+            'relation'=>'Generater all relation by column name and table,not of the Foreign key',
         ]);
     }
 
@@ -124,7 +129,7 @@ class Generator extends \yii\gii\generators\model\Generator
     public function stickyAttributes()
     {
         return array_merge(parent::stickyAttributes(), [
-            'only', 'except', 'statusCode','withOneUser','labelExplain','labelTran','targetLanguage','statusCodeMessage']);
+            'only', 'except', 'statusCode','withOneUser','labelExplain','labelTran','targetLanguage','statusCodeMessage','relation']);
     }
 
     public function validateStatusCodeMessageCategory(){
@@ -170,6 +175,29 @@ class Generator extends \yii\gii\generators\model\Generator
         return $className;
     }
 
+    public $relationTable=[];
+    public $modelNames=[];
+    public $modelTree=[];
+
+
+    public function generateRelationByColumns(){
+        $db = $this->getDbConnection();
+        foreach ($this->getTableNames() as $tableName) {
+            $tableSchames=$db->getTableSchema($tableName);
+            $this->modelNames[]=$this->generateClassName($tableName);
+            foreach ($tableSchames->columns as $column) {
+                if($column->name=='parent_id'){
+                    $modelTree[]=$tableName;
+                }else{
+                    if($column->name!='id' && ($point=strpos($column->name,'_id'))){
+                        $tableLink=trim(substr($column->name,0,$point),'_');
+                        $this->relationTable[$tableName][$column->name]=Inflector::id2camel($tableLink,'_');
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * @inheritdoc
      */
@@ -178,6 +206,8 @@ class Generator extends \yii\gii\generators\model\Generator
         $files = [];
         $relations = $this->generateRelations();
         $db = $this->getDbConnection();
+
+        $this->generateRelationByColumns();
         foreach ($this->getTableNames() as $tableName) {
             if($this->tableRange($tableName) == false){
                 continue;

@@ -1,6 +1,7 @@
 <?php
 
 /* @var $modelClassName string related model class name */
+/* @var $generator lbmzorx\giitool\generators\modelsall\Generator */
 $modelFullClassName = $className;
 
 $ns=ltrim($generator->ns,"\\");
@@ -165,5 +166,17 @@ foreach ($tableSchema->columns as $colum){
         ];
     }
 <?php endif;?>
+<?php if($generator->relation && !empty($generator->relationTable[$tableName])):?>
+<?php foreach ($generator->relationTable[$tableName] as $k=>$v):?>
 
+<?php if (in_array($v,$generator->modelNames)):?>
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function get<?=$v?>(){
+            return $this->hasOne(<?=$v?>::className(),['id'=>'<?=$k?>']);
+    }
+<?php endif;?>
+<?php endforeach;?>
+<?php endif;?>
 }
