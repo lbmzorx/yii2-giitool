@@ -104,6 +104,7 @@ foreach ($tableSchema->columns as $colum){
             'update' => [
 <?php foreach ($properties as $name=>$property):?>
 <?php if(strtolower($name) == 'id') continue;?>
+<?php if(in_array($tableName,$generator->modelTree) && in_array($name,['level','path'])) continue;?>
 <?php if($generator->timeAdd && preg_match('/'.$name.'/',$generator->timeAdd)) continue;?>
 <?php if($generator->timeUpdate && preg_match('/'.$name.'/',$generator->timeUpdate)) continue;?>
                 '<?=$name?>',
@@ -112,6 +113,7 @@ foreach ($tableSchema->columns as $colum){
             'create' => [
 <?php foreach ($properties as $name=>$property):?>
 <?php if(strtolower($name) == 'id') continue;?>
+<?php if(in_array($tableName,$generator->modelTree) && in_array($name,['level','path'])) continue;?>
 <?php if($generator->timeAdd && preg_match('/'.$name.'/',$generator->timeAdd)) continue;?>
 <?php if($generator->timeUpdate && preg_match('/'.$name.'/',$generator->timeUpdate)) continue;?>
                 '<?=$name?>',
@@ -126,7 +128,7 @@ foreach ($tableSchema->columns as $colum){
     $timeUpdates=$generator->generateTimeUpdate($colums);
 
 ?>
-<?php if($timeAdds||$timeUpdates||!empty($statusCodes)):?>
+<?php if($timeAdds||$timeUpdates||!empty($statusCodes) || (in_array($tableName,$generator->modelTree))):?>
     public function behaviors()
     {
         return [
@@ -163,20 +165,79 @@ foreach ($tableSchema->columns as $colum){
             ],
 <?php endif;?>
 <?php endif;?>
+<?php if(in_array($tableName,$generator->modelTree)):?>
+            'parent_id'=>[
+                'class'=>\yii\behaviors\AttributesBehavior::className(),
+                'attributes'=>[
+                    'parent_id'=>[
+                        self::EVENT_BEFORE_INSERT=>[$this,'treeBuild'],
+                        self::EVENT_BEFORE_UPDATE=>[$this,'treeBuild'],
+                    ],
+                ],
+            ],
+<?php endif;?>
         ];
     }
 <?php endif;?>
 <?php if($generator->relation && !empty($generator->relationTable[$tableName])):?>
-<?php foreach ($generator->relationTable[$tableName] as $k=>$v):?>
+<?php $link=[];foreach ($generator->relationTable[$tableName] as $k=>$v):?>
 
-<?php if (in_array($v,$generator->modelNames)):?>
+<?php if (in_array($v,$generator->modelNames)):$link[$k]=$v?>
     /**
      * @return \yii\db\ActiveQuery
      */
     public function get<?=$v?>(){
-            return $this->hasOne(<?=$v?>::className(),['id'=>'<?=$k?>']);
+        return $this->hasOne(<?=$v?>::className(),['id'=>'<?=$k?>']);
     }
 <?php endif;?>
 <?php endforeach;?>
+
+<?php if(!empty($link)):?>
+    /**
+     * get relation columns
+     * @return array
+     */
+    public static function columnRetions(){
+        return [
+<?php foreach ($link as $k=>$v):?>
+            '<?=$k?>'=>'<?=$v?>',
+<?php endforeach;?>
+        ];
+    }
+<?php endif?>
+<?php endif;?>
+
+    /**
+     * If is tree which have parent_id
+     * @return boolean
+     */
+    public static function isTree(){
+<?php if( $generator->modelTree ):?>
+        return <?=in_array($tableName,$generator->modelTree)?'true':'false'?>;
+<?php endif;?>
+    }
+
+<?php if(in_array($tableName,$generator->modelTree)):?>
+    /**
+     * Build tree
+     * @return mixed
+     */
+    public function treeBuild($event, $attribute){
+        if($this->$attribute==0){
+            if($this->hasAttribute('level')) $this->level=0;
+            if($this->hasAttribute('path')) $this->level=0;
+        }else{
+            $parent_model=self::findOne($this->$attribute);
+            if($parent_model){
+                if($this->hasAttribute('level')) $this->level=$parent_model->level+1;
+                if($this->hasAttribute('path')) $this->path=$parent_model->path.','.$parent_model->id;
+            }else{
+                $this->$attribute=0;
+                if($this->hasAttribute('level')) $this->level=0;
+                if($this->hasAttribute('path')) $this->level=0;
+            }
+        }
+        return $this->$attribute;
+    }
 <?php endif;?>
 }

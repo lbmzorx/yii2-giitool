@@ -179,7 +179,6 @@ class Generator extends \yii\gii\generators\model\Generator
     public $modelNames=[];
     public $modelTree=[];
 
-
     public function generateRelationByColumns(){
         $db = $this->getDbConnection();
         foreach ($this->getTableNames() as $tableName) {
@@ -187,7 +186,7 @@ class Generator extends \yii\gii\generators\model\Generator
             $this->modelNames[]=$this->generateClassName($tableName);
             foreach ($tableSchames->columns as $column) {
                 if($column->name=='parent_id'){
-                    $modelTree[]=$tableName;
+                    $this->modelTree[]=$tableName;
                 }else{
                     if($column->name!='id' && ($point=strpos($column->name,'_id'))){
                         $tableLink=trim(substr($column->name,0,$point),'_');

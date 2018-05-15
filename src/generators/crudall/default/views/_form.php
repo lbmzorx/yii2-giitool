@@ -44,6 +44,11 @@ use lbmzorx\components\behavior\StatusCode;
         if(strtolower($attribute)=='id'){
             continue;
         }
+        if(method_exists($class,'isTree') && $class::isTree()){
+            if(in_array($attribute,['level','path'])){
+                continue;
+            }
+        }
 
         $count++;
         if($count==1){
