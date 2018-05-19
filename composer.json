@@ -21,11 +21,11 @@
     },
     "require": {
         "php": ">=5.4.0",
-        "yiisoft/yii2": "*",
-        "lbmzorx/yii2-components":"*"
+        "yiisoft/yii2": "*"        
     },
     "require-dev": {
-        "yiisoft/yii2-gii": "~2.0.0"
+        "yiisoft/yii2-gii": "~2.0.0",
+        "lbmzorx/yii2-components":"~0.0.3"
     },
     "autoload": {
         "psr-4": {"lbmzorx\\giitool\\": "src"}
