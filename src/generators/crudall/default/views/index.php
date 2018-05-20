@@ -40,7 +40,7 @@ STYLE
 <?= $generator->enablePjax ? "    <?php Pjax::begin(); ?>\n" : '' ?>
 <?php if(!empty($generator->searchNamespace)): ?>
     <p>
-        <?='<?'?>=Html::button(Yii::t('app','Search button').'  '.Html::tag('i','',['class'=>'fa fa-chevron-down']),['class'=>'btn btn-success ','id'=>'search-button'])?>
+        <?='<?'?>=Html::button(Yii::t('<?=$generator->messageCategory?>','Unfolding Search Condition').'  '.Html::tag('i','',['class'=>'fa fa-chevron-down']),['class'=>'btn btn-success ','id'=>'search-button'])?>
         <?="<?php\n"?>
         $this->registerJs(<?="<<<"?>str
 var show=false;
@@ -69,10 +69,10 @@ str
 
     <p>
         <?= "<?= " ?>Html::a('<i class="fa fa-plus-square"></i> '.<?= $generator->generateString('Create ' . Inflector::camel2words(StringHelper::basename($model))) ?>, ['create'], ['class' => 'btn btn-success']) ?>
-        <?= "<?= " ?>BatchDelete::widget(['name'=><?=$generator->generateString('Batch Deletes')?>]) ?>
+        <?= "<?= " ?>BatchDelete::widget(['name'=><?=$generator->generateString('Batch Deletes')?>,'griViewKey'=>GridView::$counter]) ?>
 <?php if($generator->statusCode):?>
 <?php $changeStatus=$generator->generateGetStatusCode($model); foreach ($changeStatus as $v):?>
-        <?= "<?= " ?>BatchUpdate::widget([ 'name'=>\Yii::t('model','<?=Inflector::camel2words($v)?>'),'attribute'=>'<?=$v?>','btnIcon'=>'<?=$v?>', ]) ?>
+        <?= "<?= " ?>BatchUpdate::widget([ 'name'=>\Yii::t('model','<?=Inflector::camel2words($v)?>'),'attribute'=>'<?=$v?>','btnIcon'=>'<?=$v?>','griViewKey'=>GridView::$counter]) ?>
 <?php endforeach;?>
 <?php endif;?>
     </p>
@@ -80,12 +80,13 @@ str
 <?php if ($generator->indexWidgetType === 'grid'): ?>
     <?= "<?= " ?>GridView::widget([
         'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
         'pager' =>[
             'class'=>\lbmzorx\components\widget\JumpPager::className(),
-            'firstPageLabel'=>Yii::t('app','first'),
-            'nextPageLabel'=>Yii::t('app','next'),
-            'prevPageLabel'=>Yii::t('app','prev'),
-            'lastPageLabel'=>Yii::t('app','last'),
+            'firstPageLabel'=>Yii::t('app','First'),
+            'nextPageLabel'=>Yii::t('app','Next'),
+            'prevPageLabel'=>Yii::t('app','Prev'),
+            'lastPageLabel'=>Yii::t('app','Last'),
             'jButtonLabel' =>Yii::t('app','Jump'),
             'sButtonLabel' =>Yii::t('app','PageSize'),
         ],

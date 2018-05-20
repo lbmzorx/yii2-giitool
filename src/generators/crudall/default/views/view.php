@@ -57,6 +57,9 @@ if (($tableSchema = $generator->getTableSchema($model)) === false) {
 } else {
     foreach ($generator->getTableSchema($model)->columns as $column) {
         $format = $generator->generateColumnFormat($column);
+        if( preg_match('/(time)|(_at$)/', $column->name)){
+            $format='datetime';
+        }
         if( $string=$generator->generateStatusCodeRow($model,$column->name)){
             echo $string;
         }else{

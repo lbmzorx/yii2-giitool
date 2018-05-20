@@ -901,4 +901,42 @@ DOM;
         return $string;
     }
 
+    protected $tranAttrs=[];    //all label
+    protected $commonAttrs=[];  //common label
+    protected $classAttrs=[];   //class label
+
+    public function generateTrans($className,$properties){
+        foreach ($properties as $property){
+            if (!strcasecmp($property['name'], 'id')) {
+                $label="ID";
+                $this->tranAttrs[$label]=$label;
+                $this->commonAttrs[$label]=$label;
+            } else {
+                $label = Inflector::camel2words($property['name']);
+                if (!empty($label) && substr_compare($label, ' id', -3, 3, true) === 0) {
+                    $label = substr($label, 0, -3) . ' ID';
+                }
+                if(isset($this->tranAttrs[$label])){
+                    $this->commonAttrs[$label]=empty($property['label'])&&!empty($this->tranAttrs[$label])?$this->tranAttrs[$label]:$property['label'];
+                }else{
+                    $this->classAttrs[$label]=$className;
+                }
+                $this->tranAttrs[$label]=empty($property['label'])&&!empty($this->tranAttrs[$label])?$this->tranAttrs[$label]:$property['label'];
+            }
+
+            if(!empty($property['code'])){
+                foreach ($property['code'] as $k => $v){
+                    if(!empty($property['tran'][$k])){
+                        if(isset($this->statusTrans[$v])){
+                            $this->commonStatus[$v]=empty($property['tran'][$k])&&!empty($this->statusTrans[$label])?$this->statusTrans[$label]:$property['tran'][$k];
+                        }else{
+                            $this->classStatus[$v]=$className;
+                        }
+                        $this->statusTrans[$v]=empty($property['tran'][$k])&&!empty($this->statusTrans[$label])?$this->statusTrans[$label]:$property['tran'][$k];
+                    }
+                }
+            }
+        }
+    }
+
 }
