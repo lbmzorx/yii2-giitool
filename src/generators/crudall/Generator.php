@@ -225,12 +225,14 @@ class Generator extends BaseGenerator
                     }
                 }
 
+
+                $this->generateTrans($model);
 //            }catch (\yii\base\Exception $e){
 //                continue;
 //            }
         }
 
-
+        $files[]=$this->generateLabelTrans();
 
         return $files;
 
@@ -901,42 +903,61 @@ DOM;
         return $string;
     }
 
-    protected $tranAttrs=[];    //all label
     protected $commonAttrs=[];  //common label
-    protected $classAttrs=[];   //class label
+    public function generateTrans($model){
+        $modelName= Inflector::camel2words(StringHelper::basename($model));
+        $this->commonAttrs[$modelName]='';
+    }
 
-    public function generateTrans($className,$properties){
-        foreach ($properties as $property){
-            if (!strcasecmp($property['name'], 'id')) {
-                $label="ID";
-                $this->tranAttrs[$label]=$label;
-                $this->commonAttrs[$label]=$label;
-            } else {
-                $label = Inflector::camel2words($property['name']);
-                if (!empty($label) && substr_compare($label, ' id', -3, 3, true) === 0) {
-                    $label = substr($label, 0, -3) . ' ID';
-                }
-                if(isset($this->tranAttrs[$label])){
-                    $this->commonAttrs[$label]=empty($property['label'])&&!empty($this->tranAttrs[$label])?$this->tranAttrs[$label]:$property['label'];
-                }else{
-                    $this->classAttrs[$label]=$className;
-                }
-                $this->tranAttrs[$label]=empty($property['label'])&&!empty($this->tranAttrs[$label])?$this->tranAttrs[$label]:$property['label'];
+    public function generateLabelTrans(){
+        $messageCategory=isset(\Yii::$app->i18n->translations[$this->messageCategory])?\Yii::$app->i18n->translations[$this->messageCategory]:'app';
+        $basepath=isset($messageCategory['basePath'])?$messageCategory['basePath']:'@app/message';
+        $file = Yii::getAlias($basepath).'/zh-CN/'.$this->messageCategory.'.php';
+
+        $classCommon = array_keys($this->commonAttrs);
+
+        $file_content='';
+        if(file_exists($file)){
+
+            $filestart='<\?php[\s\S.]+return\s+\[';
+            $fileend = '\];';
+
+            $content=file_get_contents($file);
+            if(preg_match('/('.$filestart.')([.\s\S]*)('.$fileend.')/',$content,$match)){
+                $file_content=$match[2];
             }
 
-            if(!empty($property['code'])){
-                foreach ($property['code'] as $k => $v){
-                    if(!empty($property['tran'][$k])){
-                        if(isset($this->statusTrans[$v])){
-                            $this->commonStatus[$v]=empty($property['tran'][$k])&&!empty($this->statusTrans[$label])?$this->statusTrans[$label]:$property['tran'][$k];
-                        }else{
-                            $this->classStatus[$v]=$className;
-                        }
-                        $this->statusTrans[$v]=empty($property['tran'][$k])&&!empty($this->statusTrans[$label])?$this->statusTrans[$label]:$property['tran'][$k];
-                    }
+            $old=require($file);
+            $classCommon = array_diff($classCommon,array_keys($old));
+            //update don't update
+        }
+
+        //common label add
+        $commonStr="\n";
+        foreach ($classCommon as $v){
+            $commonStr.="\t'{$v}'=>'{$this->commonAttrs[$v]}',\n";
+        }
+        $str['ModelName']=$commonStr;
+
+        //other label
+        foreach ($str as $k=>$v){
+            $start='\/\*start\*'.$k.'\*\/';
+            $end = '\/\*end\*'.$k.'\*\/';
+
+            if(preg_match('/('.$start.')([.\s\S]*)('.$end.')/',$file_content)){
+                if($v!="\n"){
+                    $file_content=preg_replace('/('.$start.')([.\s\S]*)('.$end.')/','${1}${2}'.$v."\t".'${3}',$file_content);
                 }
+            }else{
+                $file_content.="\n\t/*start*{$k}*/{$v}\t/*end*{$k}*/\n";
             }
         }
+        $file_content=preg_replace('/^[\s\n]+/',"",$file_content);
+        $file_content=preg_replace('/[\s\n]+$/',"",$file_content);
+        return new CodeFile(
+            $file,
+            $this->render('app.php',['tran'=>$file_content])
+        );
     }
 
 }
