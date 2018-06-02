@@ -9,6 +9,7 @@ namespace lbmzorx\giitool\generators\migrationall;
 
 use Yii;
 use lbmzorx\giitool\generators\BaseGenerator;
+use yii\base\Exception;
 use yii\db\Connection;
 use yii\db\Schema;
 use yii\gii\CodeFile;
@@ -306,7 +307,11 @@ class Generator extends BaseGenerator
             $ref = new \ReflectionClass(Schema::className());
             foreach ($ref->getConstants() as $constName => $constValue) {
                 if (strpos($constName, 'TYPE_') === 0) {
-                    $this->constans[$constValue] = '$this->' . $constValue;
+                    if($constValue=='tinyint'){
+                        $this->constans['tinyint']='$this->tinyInteger';
+                    }else{
+                        $this->constans[$constValue] = '$this->' . $constValue;
+                    }
                 }
             }
             $this->constans['smallint'] = '$this->smallInteger';

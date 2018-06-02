@@ -4,7 +4,7 @@
  */
 
 /* @var $this yii\web\View */
-/* @var $generator lbmzorx\giitool\migrationall\Generator */
+/* @var $generator \lbmzorx\giitool\generators\migrationall\Generator */
 /* @var $migrationName string migration name */
 
 //echo \yii\helpers\VarDumper::dumpAsString($unitindex);
@@ -15,6 +15,13 @@ use yii\db\Schema;
 
 class <?= $migrationName ?> extends \yii\db\Migration
 {
+<?php if($generator->db!='db'): ?>
+    public function init(){
+        $this->db = '<?=$generator->db?>';
+        parent::init();
+    }
+<?php endif?>
+
 <?php if($generator->isSafeUpDown): ?>
     public function safeUp()
 <?php else: ?>
@@ -22,7 +29,7 @@ class <?= $migrationName ?> extends \yii\db\Migration
 <?php endif; ?>
     {
 <?php if ($generator->createTableIfNotExists): ?>
-        $tables = Yii::$app->db->schema->getTableNames();
+        $tables = Yii::$app-><?=$generator->db?>->schema->getTableNames();
 <?php endif; ?>
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
@@ -35,7 +42,7 @@ class <?= $migrationName ?> extends \yii\db\Migration
         if ($generator->createTableIfNotExists == 1) :
         $t = '  ';
 ?>
-        if (!in_array(Yii::$app->db->tablePrefix.'<?= $tableRaw ?>', $tables))  {
+        if (!in_array(Yii::$app-><?=$generator->db?>->tablePrefix.'<?= $tableRaw ?>', $tables))  {
 <?php endif; ?>
         $this->createTable('<?= $table['name'] ?>', [
 <?php foreach ($table['columns'] as $column => $definition): ?>
@@ -68,7 +75,7 @@ class <?= $migrationName ?> extends \yii\db\Migration
 <?php endif; ?>
 <?php if ($generator->createTableIfNotExists == 1) :?>
         } else {
-          echo "\nTable `".Yii::$app->db->tablePrefix."<?= $tableRaw ?>` already exists!\n";
+          echo "\nTable `".Yii::$app-><?=$generator->db?>->tablePrefix."<?= $tableRaw ?>` already exists!\n";
         }
 <?php endif; ?>
 <?php endforeach;?>
