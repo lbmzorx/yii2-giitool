@@ -197,7 +197,7 @@ class Generator extends BaseGenerator
             $model=trim(str_replace('.php','',trim(str_replace($modelPath,'',$v),'\\')));
             $controller=$model.'Controller';
 
-//            try{
+            try{
                 $searchModel='';
                 if (!empty($this->searchNamespace)) {
                     $searchModel = Yii::getAlias('@' . str_replace('\\', '/', ltrim($this->searchNamespace, '\\') .'/'.$model. '.php'));
@@ -227,9 +227,9 @@ class Generator extends BaseGenerator
 
 
                 $this->generateTrans($model);
-//            }catch (\yii\base\Exception $e){
-//                continue;
-//            }
+            }catch (\yii\base\Exception $e){
+                continue;
+            }
         }
 
         $files[]=$this->generateLabelTrans();

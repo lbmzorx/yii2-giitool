@@ -88,8 +88,12 @@ class <?= $model ?> extends DataModel
 <?php foreach ($order as $name=>$value):?>
                     '<?=$name?>' => <?=$value?>,
 <?php endforeach;?>
-                ]
-            ]
+                ],
+            ],
+            'pagination'=>[
+                'pageParam'=>'page',
+                'pageSizeParam'=>'per-page',
+            ],
 <?php endif;?>
         ]);
 
