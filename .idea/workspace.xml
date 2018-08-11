@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8d09c7e8-2c90-49f2-8c50-71eeed9ecaf9" name="Default" comment="add the database md file generater">
+    <list default="true" id="8d09c7e8-2c90-49f2-8c50-71eeed9ecaf9" name="Default" comment="">
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
     </list>
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -140,6 +139,9 @@
       <pane id="Scope" />
     </panes>
   </component>
+  <component name="PropertiesComponent">
+    <property name="GO_FMT" value="false" />
+  </component>
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
   </component>
@@ -150,7 +152,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1526717755308</updated>
-      <workItem from="1534005621676" duration="401000" />
+      <workItem from="1534005621676" duration="432000" />
     </task>
     <task id="LOCAL-00001" summary="add restful api application generater">
       <created>1534005743371</created>
@@ -166,11 +168,18 @@
       <option name="project" value="LOCAL" />
       <updated>1534005801990</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="add ignore">
+      <created>1534006049729</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1534006049729</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="401000" />
+    <option name="totallyTimeSpent" value="432000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1038" extended-state="0" />
@@ -224,7 +233,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add restful api application generater" />
     <MESSAGE value="add the database md file generater" />
-    <option name="LAST_COMMIT_MESSAGE" value="add the database md file generater" />
+    <MESSAGE value="add ignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="add ignore" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
