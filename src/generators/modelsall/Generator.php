@@ -11,6 +11,7 @@ use Yii;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\TableSchema;
 use yii\gii\CodeFile;
 use yii\helpers\FileHelper;
 use yii\helpers\Inflector;
@@ -36,6 +37,8 @@ class Generator extends \yii\gii\generators\model\Generator
     public $statusCodeMessage='statuscode';
 
     public $relation=true;
+
+    public $mdDoc='';
 
     /**
      * @inheritdoc
@@ -77,6 +80,7 @@ class Generator extends \yii\gii\generators\model\Generator
             [['only','except','dataNamespace','timeUpdate','timeAdd',],'string'],
             [['dataNamespace','statusCode','timeUpdate','timeAdd'] , 'filter' , 'filter' => 'trim'] ,
             [['statusCode','withOneUser','labelExplain','labelTran','relation',] , 'boolean' ,] ,
+            [['mdDoc',] , 'string' ,] ,
         ];
     }
 
@@ -97,6 +101,7 @@ class Generator extends \yii\gii\generators\model\Generator
             'labelTran'=>'Tanslation label to translation file',
             'targetLanguage'=>'Translation label to target language by used table comments',
             'relation'=>'Analysis relation except of Foreign key',
+            'mdDoc'=>'Generate markdown file to as document for model',
         ]);
     }
 
@@ -120,6 +125,7 @@ class Generator extends \yii\gii\generators\model\Generator
                 <code>状态.tran:0=,1=冻结.code:0=Delete,1=Freeze.</code> 
                  It will tran as <code>\'Delete\'=>\'删除\',\'Freeze\'=>\'冻结\'</code> ',
             'relation'=>'Generater all relation by column name and table,not of the Foreign key',
+            'mdDoc'=>'Generater the document for model which you can read model provide more symple way to use it',
         ]);
     }
 
@@ -129,7 +135,7 @@ class Generator extends \yii\gii\generators\model\Generator
     public function stickyAttributes()
     {
         return array_merge(parent::stickyAttributes(), [
-            'only', 'except', 'statusCode','withOneUser','labelExplain','labelTran','targetLanguage','statusCodeMessage','relation']);
+            'only', 'except', 'statusCode','withOneUser','labelExplain','labelTran','targetLanguage','statusCodeMessage','relation','mdDoc']);
     }
 
     public function validateStatusCodeMessageCategory(){
@@ -252,6 +258,9 @@ class Generator extends \yii\gii\generators\model\Generator
             }
             //translation
             $this->generateTrans($modelClassName,$params['properties']);
+
+            $this->_tableShemas[]=$tableSchema;
+            $this->_mdLinks[]=$tableSchema->name;
         }
         if($this->labelTran){
             $files[] = $this->generateLabelTrans();
@@ -259,6 +268,11 @@ class Generator extends \yii\gii\generators\model\Generator
         //translation status code
         if($this->statusCode){
             $files[] = $this->generateStatusTran();
+        }
+
+        //md generate
+        if($this->mdDoc){
+            $files[] = $this->generateMds();
         }
 
         return $files;
@@ -555,4 +569,99 @@ class Generator extends \yii\gii\generators\model\Generator
 
         return $properties;
     }
+
+
+    protected $_tableShemas=[];
+    public function generateMds(){
+        $file=\yii::getAlias('@'.$this->mdDoc).'.md';
+        if(file_exists($file)){
+            $content=file_get_contents($file);
+        }else{
+            $content='';
+        }
+
+        $content=$this->generateTableMdLink($content);
+
+        foreach ($this->_tableShemas as $tableShema){
+            $content=$this->generateTableMd($tableShema,$content);
+        }
+        return new CodeFile(
+            $file,
+            $this->render('mddoc.php',['content'=>$content])
+        );
+    }
+
+    protected $_tableMdDoc;
+
+    /**
+     * @param $tableSchema TableSchema
+     */
+    protected function generateTableMd($tableSchema,$content=''){
+        $tableMdDoc=$this->getTableMdDoc($tableSchema);
+        $mdString=$tableMdDoc->generateMdString();
+
+        $tablstart="<!--start_table_{$tableSchema->name}-->";
+        $tablend="<!--end_table_{$tableSchema->name}-->";
+
+        if(preg_match('/('.$tablstart.')([.\s\S]*)('.$tablend.')/',$content)){
+            $content=preg_replace('/('.$tablstart.')([.\s\S]*)('.$tablend.')/','${1}'.$mdString.'${3}',$content);
+        }else{
+            $content.="\n{$tablstart}{$mdString}\n{$tablend}";
+        }
+        return $content;
+    }
+
+    /**
+     * @param $tableSchema TableSchema
+     * @return TableMdDoc|object
+     */
+    public function getTableMdDoc($tableSchema){
+        if( $this->_tableMdDoc == null){
+            $this->_tableMdDoc = Yii::createObject([
+                'class'=>TableMdDoc::className(),
+                'tableSchema'=>$tableSchema,
+                'tableName'=>$tableSchema->name,
+                'db'=>$this->getDbConnection(),
+                'commitCodes'=>[],
+            ]);
+        }elseif($this->_tableMdDoc instanceof TableMdDoc){
+            $this->_tableMdDoc->setTableSchema($tableSchema);
+            $this->_tableMdDoc->tableName=$tableSchema->name;
+            $this->_tableMdDoc->db=$this->getDbConnection();
+            $this->_tableMdDoc->commitCodes=[];
+
+        }
+        return $this->_tableMdDoc;
+    }
+
+    protected $_mdLinks=[];
+    public function generateTableMdLink($content=''){
+        $tablstart="<!--start_md_link_table-->";
+        $tablend="<!--end_md_link_table-->";
+        $mdString='';
+        $file_content="## 表列表\n\n";
+        $matchlink=false;
+        if(preg_match('/('.$tablstart.')([.\s\S]*)('.$tablend.')/',$content,$match)){
+            $file_content=$match[2];
+            $matchlink=true;
+        }
+        foreach ($this->_mdLinks as $k=>$link){
+            $linkstart="<!--start_md_link_table_{$link}-->";
+            $linkend="<!--end_md_link_table_{$link}-->";
+            $mdString=($k+1).'. [表 '.$link.'](#'.$link.")\n";
+            if(preg_match('/('.$linkstart.')([.\s\S]*)('.$linkend.')/',$file_content)){
+                $file_content=preg_replace('/('.$linkstart.')([.\s\S]*)('.$linkend.')/','${1}'.$mdString.'${3}',$file_content);
+            }else{
+                $file_content.="{$linkstart}\n{$mdString}{$linkend}\n";
+            }
+        }
+        if($matchlink){
+            $content=preg_replace('/('.$tablstart.')([.\s\S]*)('.$tablend.')/','${1}'.$file_content.'${3}',$content);
+        }else{
+            $content=$file_content;
+        }
+
+        return $content;
+    }
+
 }

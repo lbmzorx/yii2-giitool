@@ -37,3 +37,4 @@ echo $form->field($generator, 'timeAdd');
 echo $form->field($generator, 'timeUpdate');
 echo $form->field($generator, 'statusCode')->checkbox();
 echo $form->field($generator, 'withOneUser')->checkbox();
+echo $form->field($generator, 'mdDoc');
