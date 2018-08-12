@@ -132,8 +132,8 @@ primary;
 
 ### 表列详细信息 共有 **{$count}** 列
 
-| 名称 | 允许为空 | 类型 | 长度 | 精度 | 主键 | 自动增长 | 有无符号 | 注释 |
-|------|---------|-----|------|-----|-----|---------|---------|------|
+| 名称 | 为空 | 类型 | 长度 | 精度 | 默认| 主键 | 自增 |  注释 |
+|------|---------|-----|------|-----|-----|---------|------|-----|
 
 column;
 
@@ -142,12 +142,12 @@ column;
              * @var $column \yii\db\mysql\ColumnSchema
              */
 
-            $allowNull=$column->allowNull?'是':'否';
-            $primaryKey=$column->isPrimaryKey?'是':'否';
-            $autoIncrement=$column->autoIncrement?'是':'否';
-            $unsigned=$column->unsigned?'无':'有';
+            $allowNull=$column->allowNull?'**&radic;**':'	&times;';
+            $primaryKey=$column->isPrimaryKey?'**&radic;**':'	&times;';
+            $autoIncrement=$column->autoIncrement?'**&radic;**':'	&times;';
+            $default=$column->defaultValue===null && $column->allowNull==true ?'null':$column->defaultValue;
 
-            $template.="| {$column->name} | {$allowNull} | {$column->dbType} | {$column->size} | {$column->precision} |  {$primaryKey} | {$autoIncrement}| {$unsigned} | {$column->comment} |\n";
+            $template.="| {$column->name} | {$allowNull} | {$column->dbType} | {$column->size} | {$column->precision} | {$default} |  {$primaryKey} | {$autoIncrement}| {$column->comment} |\n";
             $this->commentCode($column);
         }
         $template.=$this->getCommentMd();
@@ -166,7 +166,7 @@ column;
 
                 $template.=<<<template
 
-列: {$key}
+- 列: {$key}
 
 > $ommit
 
@@ -259,8 +259,33 @@ template;
      */
     protected function getTableCreateMd($tableSchema){
         $info=$this->getTableCreateInfo($tableSchema->name);
+
+        $engine='';
+        $cherset='';
+        $collate='';
+        $comment='';
+        if(preg_match('/(ENGINE=\w+)/',$info['Create Table'],$match)){
+            $engine=isset($match[1])?substr($match[1],7):'';
+        }
+        if(preg_match('/(CHARSET=\w+)/',$info['Create Table'],$match)){
+            $cherset=isset($match[1])?substr($match[1],8):'';
+        }
+        if(preg_match('/(COLLATE=\w+)/',$info['Create Table'],$match)){
+            $collate=isset($match[1])?substr($match[1],8):'';
+        }
+        if(preg_match('/(COMMENT=\'.*\')/',$info['Create Table'],$match)){
+            $comment=isset($match[1])?substr($match[1],8):'';
+            $comment=trim($comment,'\'');
+        }
+
+
         if(is_array($info) && isset($info['Create Table'])){
             return <<<create
+- 引擎:$engine
+- 字符集:$cherset
+- 字符排序:$collate
+
+{$comment}
 
 ### 创建表sql语句
 
