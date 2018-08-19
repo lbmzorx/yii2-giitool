@@ -18,6 +18,7 @@ class Bootstrap implements BootstrapInterface
                 $app->getModule('gii')->generators['giitool-modelsall']['class']= 'lbmzorx\giitool\generators\modelsall\Generator';
                 $app->getModule('gii')->generators['giitool-migrationall']['class']= 'lbmzorx\giitool\generators\migrationall\Generator';
                 $app->getModule('gii')->generators['giitool-crudall']['class']= 'lbmzorx\giitool\generators\crudall\Generator';
+                $app->getModule('gii')->generators['giitool-markdowndb']['class']= 'lbmzorx\giitool\generators\markdowndb\Generator';
             }
         }
     }
